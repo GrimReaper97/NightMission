@@ -61,7 +61,6 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (407,351), (342,457), 2)
 				,pymunk.Segment(space.static_body, (333,318), (407,352), 2)
 				,pymunk.Segment(space.static_body, (333,12), (333,318), 2)
-				
 #~ ***************************** BARRETTE "N I G H T" *********************
 				,pymunk.Segment(space.static_body, (606.5,554), (606.5,609), 3)
 				,pymunk.Segment(space.static_body, (647,558), (647,621), 3)
@@ -69,18 +68,16 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (723,564), (723,631), 3)
 				,pymunk.Segment(space.static_body, (763,557), (763,619), 3)
 				,pymunk.Segment(space.static_body, (803,554), (803,609), 3)
-				
 #~ ************************** LATO "D R O P" **********************************
 				,pymunk.Segment(space.static_body, (376.8,86), (376.8,165), 1)
 				,pymunk.Segment(space.static_body, (359,164), (359,257), 1)
 				,pymunk.Segment(space.static_body, (382,165), (359,165), 1)
 				,pymunk.Segment(space.static_body, (375,165), (359,178), 1)
-				,pymunk.Segment(space.static_body, (483,86), (376.8,86), 1)
-				,pymunk.Segment(space.static_body, (409,125), (382,166), 1)
-				,pymunk.Segment(space.static_body, (484,91), (409,125), 1)
+				,pymunk.Segment(space.static_body, (481,86), (376.8,86), 1)
+				,pymunk.Segment(space.static_body, (407,125), (382,166), 1)
+				,pymunk.Segment(space.static_body, (484,91), (410,125), 1)
 				,pymunk.Segment(space.static_body, (385,219), (385,257), 1)
 				,pymunk.Segment(space.static_body, (411,219), (411,257), 1)
-				
 #~ *************************** LATO MOLLA BONUS ****************************
 				,pymunk.Segment(space.static_body, (815,130), (724,91), 1)
 				,pymunk.Segment(space.static_body, (831,86), (728,86), 1)
@@ -98,11 +95,41 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (825, 230), (825, 278), 1.0)
 				,pymunk.Segment(space.static_body, (825, 230), (793, 290), 1.0)
 				,pymunk.Segment(space.static_body, (812, 320), (793, 290), 1.0)
-				
-				#~ ************ BUMPER SINISTRO ***********
+#~ ******************************** BUMPER SINISTRO ****************************
 				,pymunk.Segment(space.static_body, (484,117), (436,142), 1)
 				,pymunk.Segment(space.static_body, (436,257), (436,142), 1)
 				,pymunk.Segment(space.static_body, (484,117), (497,124), 1)
+#~ ******************************* BUMPER DESTRO ****************************
+				,pymunk.Segment(space.static_body, (724,120), (782,145), 1)
+				,pymunk.Segment(space.static_body, (782,145), (782,243), 1)
+				,pymunk.Segment(space.static_body, (768,264), (782,243), 1)
+				,pymunk.Segment(space.static_body, (724,120), (710,133), 1)
+#~ ********************************* AEROPORTO DI BIRGI **************************
+				,pymunk.Segment(space.static_body, (375,467), (375,640), 1)
+				,pymunk.Segment(space.static_body, (375,467), (438,390), 1)
+				,pymunk.Segment(space.static_body, (438,390), (540,432), 1)
+				,pymunk.Segment(space.static_body, (540,432), (540,532), 1)
+				,pymunk.Segment(space.static_body, (540,532), (556,563), 1)
+				,pymunk.Segment(space.static_body, (556,563), (556,625), 1)
+				
+				,pymunk.Segment(space.static_body, (382,477), (382,640), 1)
+				,pymunk.Segment(space.static_body, (375,640), (382,640), 2)
+				,pymunk.Segment(space.static_body, (382,477), (399,457), 1)
+				,pymunk.Segment(space.static_body, (527,457), (399,457), 1)
+				,pymunk.Segment(space.static_body, (529,457), (529,607), 1)
+				,pymunk.Segment(space.static_body, (552,626), (529,607), 1)
+				,pymunk.Segment(space.static_body, (552,626), (556,626), 1)
+#~ *******************************AEROPORTO DI BIRGI INTERNO**********************
+				,pymunk.Segment(space.static_body, (420,620), (420,484), 1)
+				,pymunk.Segment(space.static_body, (426,480), (495,480), 1)
+				,pymunk.Segment(space.static_body, (426,480), (420,484), 1)
+				,pymunk.Segment(space.static_body, (499,611), (499,484), 1)
+				,pymunk.Segment(space.static_body, (495,480), (499,484), 1)
+				,pymunk.Segment(space.static_body, (420,620), (462,655), 1)
+				,pymunk.Segment(space.static_body, (505,655), (462,655), 1)
+				,pymunk.Segment(space.static_body, (505,655), (525.5,648), 1)
+				,pymunk.Segment(space.static_body, (526,635), (526,647), 1)
+				,pymunk.Segment(space.static_body, (526,635), (499,611), 1)
 ]
 
 
@@ -112,6 +139,21 @@ for wall in staticwalls:
 	wall.color = pygame.color.THECOLORS["red"]
 space.add(staticwalls)
 
+
+##bumpers laterali
+#~ lateralbumpers = [pymunk.Segment(space.static_body, (438,257), (498,123), 1)
+				#~ ,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
+#~ ]
+
+
+#~ bodybumper_r = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+#~ c = pymunk.Segment(bodybumper_r,(768,264), (709,133), 1)
+#~ c.elesticity = 10
+#~ c.color = pygame.color.THECOLORS["red"]
+#~ acab = pymunk.Segment(bodybumper_r,(438,257), (498,123), 1)
+#~ acab.elesticity = 10
+#~ acab.color = pygame.color.THECOLORS["red"]
+#~ space.add(c,acab)
 
 
 ##bumpers
@@ -165,10 +207,13 @@ a = pymunk.PinJoint(l_bar_body, l_bar_union_body, (0,0), (0,0))
 l = pymunk.DampedRotarySpring(l_bar_body, l_bar_union_body, -0.15, 20000000, 900000)
 space.add(a, l)
 
+r_bar_form.group = l_bar_form.group = 1
+r_bar_form.elasticity = l_bar_form.elasticity = 0.7
+
 #Font
 font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
 fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
-
+fontsuino = pygame.font.Font('FONT/ARCADECLASSIC.TTF',40)
 
 #Game
 MOVEEVENT,t = pygame.USEREVENT+1,2000
@@ -189,7 +234,7 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_q: #Quit
 				pygame.quit()
 				sys.exit()
-			elif event.type == KEYDOWN and event.key == K_a: #Restart
+			elif event.type == KEYDOWN and event.key == K_a: #Start
 				#Create the ball
 				newball()
 				
@@ -204,7 +249,7 @@ while 1:
 		window.blit(startgame,(485,280))
 		pygame.display.update()
 	while running:
-		sfondo = pygame.image.load("suca.jpg")
+		sfondo = pygame.image.load("prova1.jpg")
 		window.blit(sfondo,(0,0))
 		for event in pygame.event.get():
 			if event.type == QUIT:
@@ -270,9 +315,9 @@ while 1:
 						space.add(ballbody, ballform)
 						ball.append(ballform)
 						
-						
 						ballbody.apply_impulse_at_local_point((Vec2d((0,700))))
 						go = False
+						
 		### Draw stuff
 		space.debug_draw(OptionsDraw)
 
@@ -292,7 +337,23 @@ while 1:
 		dt = 2/60.0/5.5
 		for x in range(9):
 			space.step(dt)
-
+		
+		#Rettangoli punteggio 
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 50, 270, 52], 2)
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 162, 270, 52], 2)
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 274, 270, 52], 2)
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 386, 270, 52], 2)
+		
+		#Numeri
+		NUMEROUNO= fontsuino.render(("1"),True,THECOLORS["white"])
+		NUMERODUE= fontsuino.render(("2"),True,THECOLORS["white"])
+		NUMEROTRE= fontsuino.render(("3"),True,THECOLORS["white"])
+		NUMEROQUATTRO= fontsuino.render(("4"),True,THECOLORS["white"])
+		window.blit(NUMEROUNO,(150,15))
+		window.blit(NUMERODUE,(150,125))
+		window.blit(NUMEROTRE,(150,235))
+		window.blit(NUMEROQUATTRO,(150,345))
+		
 		### Flip screen
 		pygame.display.update()
 		time1.tick(60)
