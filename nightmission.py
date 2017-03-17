@@ -216,7 +216,7 @@ fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
 fontsuino = pygame.font.Font('FONT/ARCADECLASSIC.TTF',40)
 
 #Game
-MOVEEVENT,t = pygame.USEREVENT+1,2000
+MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
 ball = []
 start = True
