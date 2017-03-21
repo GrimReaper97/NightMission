@@ -48,6 +48,40 @@ def punteggio():
 		window.blit(NUMEROTRE,(150,235))
 		window.blit(NUMEROQUATTRO,(150,345))
 
+def letters():
+	lettera_N = fontsmall.render(("N"),True,THECOLORS["white"])
+	lettera_I = fontsmall.render(("I"),True,THECOLORS["white"])
+	lettera_G = fontsmall.render(("G"),True,THECOLORS["white"])
+	lettera_H = fontsmall.render(("H"),True,THECOLORS["white"])
+	lettera_T = fontsmall.render(("T"),True,THECOLORS["white"])
+	
+	lettera_D = fontsmall.render(("D"),True,THECOLORS["white"])
+	lettera_R = fontsmall.render(("R"),True,THECOLORS["white"])
+	lettera_O = fontsmall.render(("O"),True,THECOLORS["white"])
+	lettera_P = fontsmall.render(("P"),True,THECOLORS["white"])
+	
+	lettera_A = fontsmall.render(("A"),True,THECOLORS["white"])
+	lettera_B = fontsmall.render(("B"),True,THECOLORS["white"])
+	lettera_C = fontsmallest.render(("C"),True,THECOLORS["white"])
+	lettera_D2 = fontsmallest.render(("D"),True,THECOLORS["white"])
+
+
+	window.blit(lettera_N,(620,140))
+	window.blit(lettera_I,(659,135))
+	window.blit(lettera_G,(698,132))
+	window.blit(lettera_H,(736,135))
+	window.blit(lettera_T,(776,140))
+	
+	window.blit(lettera_D,(340,460))
+	window.blit(lettera_R,(366,460))
+	window.blit(lettera_O,(392,460))
+	window.blit(lettera_P,(417,460))
+	
+	window.blit(lettera_A,(795,325))
+	window.blit(lettera_B,(818,347))
+	window.blit(lettera_C,(492,38))
+	window.blit(lettera_D2,(517,44))
+
 def speed(springs):
 	if springs == 584:
 		power = 300
@@ -108,9 +142,9 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 #~ ************************** LATO "D R O P" **********************************
 				,pymunk.Segment(space.static_body, (376.8,86), (376.8,165), 1)
 				,pymunk.Segment(space.static_body, (359,164), (359,257), 1)
-				,pymunk.Segment(space.static_body, (382,165), (359,165), 1)
+				,pymunk.Segment(space.static_body, (382,166), (359,165), 1)
 				,pymunk.Segment(space.static_body, (375,165), (359,178), 1)
-				,pymunk.Segment(space.static_body, (480,86), (376.8,86), 1)
+				,pymunk.Segment(space.static_body, (470,86), (376.8,86), 1)
 				,pymunk.Segment(space.static_body, (409,125), (382,166), 1)
 				,pymunk.Segment(space.static_body, (484,91), (409,125), 1)
 				,pymunk.Segment(space.static_body, (385,219), (385,257), 1)
@@ -170,6 +204,10 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				
 				,pymunk.Segment(space.static_body, (438,257), (498,123), 1)
 				,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
+				
+				         #~ ********ROLLINO*************
+				,pymunk.Segment(space.static_body, (574,500), (574,460), 2)
+
 ]
 
 
@@ -248,7 +286,7 @@ r_bar_form.elasticity = l_bar_form.elasticity = 0.7
 font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
 fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
 fontsuino = pygame.font.Font('FONT/ARCADECLASSIC.TTF',40)
-
+fontsmallest = pygame.font.Font('FONT/ARCADECLASSIC.TTF',25)
 #Game
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
@@ -376,14 +414,16 @@ while 1:
 		
 		for bumper in bumpers:
 			disegnabumper(bumper)
+		
+
 		### Update physics
 		dt = 1/50.0/3
 		for x in range(9):
 			space.step(dt)
 		
 		punteggio()
-		#print(ballbody.position)
-		#ballbody.apply_force_at_local_point((50,200),(20,0))
+		letters()
+		
 
 		### Flip screen
 		time.tick(30)
