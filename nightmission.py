@@ -189,22 +189,22 @@ space.add(staticwalls)
 
 ##bumpers
 for p in [(790,500), (650,320),(700,450)]:
-    body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-    body.position = p
-    shape = pymunk.Circle(body, 14)
-    shape.elasticity = 2
-    shape.color = pygame.color.THECOLORS["white"]
-    space.add(shape)
-    bumpers.append(shape)
-    
+	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+	body.position = p
+	shape = pymunk.Circle(body, 14)
+	shape.elasticity = 2
+	shape.color = pygame.color.THECOLORS["white"]
+	space.add(shape)
+	bumpers.append(shape)
+
 for q in [(630,500),(550,350)]:
-    body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-    body.position = q
-    shape = pymunk.Circle(body, 9)
-    shape.elasticity = 2
-    shape.color = pygame.color.THECOLORS["white"]
-    space.add(shape)
-    bumpers.append(shape)
+	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+	body.position = q
+	shape = pymunk.Circle(body, 9)
+	shape.elasticity = 2
+	shape.color = pygame.color.THECOLORS["white"]
+	space.add(shape)
+	bumpers.append(shape)
 
 
 ##Flipper
@@ -224,7 +224,7 @@ r_bar_union_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 r_bar_union_body.position = r_bar_body.position 
 a = pymunk.PinJoint(r_bar_body, r_bar_union_body, (0,0), (0,0))
 #todo: tweak values of spring better
-l = pymunk.DampedRotarySpring(r_bar_body, r_bar_union_body, 0.15, 20000000,900000)
+l = pymunk.DampedRotarySpring(r_bar_body, r_bar_union_body, 0.35, 20000000,900000)
 space.add(a, l)
 
 # left flipper
@@ -237,7 +237,7 @@ space.add(l_bar_body, l_bar_form)
 l_bar_union_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 l_bar_union_body.position = l_bar_body.position 
 a = pymunk.PinJoint(l_bar_body, l_bar_union_body, (0,0), (0,0))
-l = pymunk.DampedRotarySpring(l_bar_body, l_bar_union_body, -0.15, 20000000, 900000)
+l = pymunk.DampedRotarySpring(l_bar_body, l_bar_union_body, -0.35, 20000000, 900000)
 space.add(a, l)
 
 r_bar_form.group = l_bar_form.group = 1
@@ -319,7 +319,6 @@ while 1:
 			radius = 10
 			inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
 			ballbody = pymunk.Body(mass, inertia, body_type=pymunk.Body.STATIC)
-
 			ballform = pymunk.Circle(ballbody, radius, (0,0))
 			ballform.elasticity = 0.7
 			ballform.color = pygame.color.THECOLORS["white"]
@@ -352,7 +351,12 @@ while 1:
 						
 						ballbody.apply_impulse_at_local_point((Vec2d((0,700))))
 						go = False
-					
+#*** PROVA AEROPORTO DI BIRGI****
+		if 500 <= ballbody.position.x <= 550 and 450 < ballbody.position.y < 500:
+			punteggio()
+			ballbody.apply_impulse_at_local_point((Vec2d((0,400))))
+
+#*** PROVA AEROPORTO DI BIRGI****
 		### Draw stuff
 		space.debug_draw(OptionsDraw)
 
