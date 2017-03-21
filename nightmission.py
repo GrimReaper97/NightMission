@@ -1,6 +1,6 @@
 def newball():
 	mass = 1.5
-	radius = 10
+	radius = 10.3
 	moment = pm.moment_for_circle(mass, radius, 0.0, (0,0))
 	ballbody = pm.Body(mass, moment)
 	ballbody.position = Vec2d(890,300) 
@@ -88,11 +88,11 @@ def speed(springs):
 	elif springs == 614:
 		power = 500
 	elif springs == 644:
-		power = 700
+		power = 630
 	elif springs == 674:
-		power = 900
+		power = 950
 	elif springs == 704:
-		power = 1500
+		power = 1550
 	return (power)
 
 import random,pygame,sys
@@ -247,14 +247,14 @@ for q in [(630,500),(550,350)]:
 
 
 ##Flipper
-rbar = [(20,-15), (-85, 0), (15,10)]
-lbar = [(-20,-15), (85, 0), (-5,10)]
+rbar = [(27,-16), (-90, 0), (15,10)]
+lbar = [(-27,-16), (90, 0), (-5,10)]
 mass = 100
 mo = pymunk.moment_for_poly(mass, rbar)
 
 # right flipper
 r_bar_body = pymunk.Body(mass, mo)
-r_bar_body.position = 710, 78
+r_bar_body.position = 710, 76
 r_bar_form = pymunk.Poly(r_bar_body, rbar)
 r_bar_form.color = pygame.color.THECOLORS["white"]
 space.add(r_bar_body, r_bar_form)
@@ -268,7 +268,7 @@ space.add(a, l)
 
 # left flipper
 l_bar_body = pymunk.Body(mass, mo)
-l_bar_body.position = 490, 78
+l_bar_body.position = 490, 76
 l_bar_form = pymunk.Poly(l_bar_body, lbar)
 l_bar_form.color = pygame.color.THECOLORS["white"]
 space.add(l_bar_body, l_bar_form)
@@ -354,8 +354,8 @@ while 1:
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
 			
-			mass = 1
-			radius = 10
+			mass = 1.5
+			radius = 10.3
 			inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
 			ballbody = pymunk.Body(mass, inertia, body_type=pymunk.Body.STATIC)
 			ballform = pymunk.Circle(ballbody, radius, (0,0))
@@ -375,8 +375,8 @@ while 1:
 					if event.type == MOVEEVENT:
 						space.remove(ballbody, ballform)
 						balls.remove(ballform)
-						mass = 1
-						radius = 10
+						mass = 1.5
+						radius = 10.3
 						inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
 						ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
 						ballform = pymunk.Circle(ballbody, radius, (0,0))
@@ -386,19 +386,32 @@ while 1:
 						space.add(ballbody, ballform)
 						balls.append(ballform)
 						
-						ballbody.apply_impulse_at_local_point((Vec2d((0,700))))
+						ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
 						go = False
 #*** MOLLA AEROPORTO DI BIRGI****
 		if 500 <= ballbody.position.x <= 550 and 450 < ballbody.position.y < 500:
 			punteggio()
-			ballbody.apply_impulse_at_local_point((Vec2d((0,400))))
+			space.remove(ballbody, ballform)
+			balls.remove(ballform)
+			mass = 1.5
+			radius = 10.3
+			inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
+			ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
+			ballform = pymunk.Circle(ballbody, radius, (0,0))
+			ballform.elasticity = 0.7
+			ballform.color = pygame.color.THECOLORS["white"]
+			ballbody.position = 510, 480
+			space.add(ballbody, ballform)
+			balls.append(ballform)
+			ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
+
 
 
 		### Draw stuff
 		space.debug_draw(OptionsDraw)
 
-		r_bar_body.position = 710, 78
-		l_bar_body.position = 490, 78
+		r_bar_body.position = 710, 76
+		l_bar_body.position = 490, 76
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
 		
 		#Respawn balls
