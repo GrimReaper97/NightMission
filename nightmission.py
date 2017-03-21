@@ -1,17 +1,51 @@
 def newball():
 	mass = 1
 	radius = 10
-	inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
-	ballbody = pymunk.Body(mass, inertia)
-	ballform = pymunk.Circle(ballbody, radius, (0,0))
+	moment = pm.moment_for_circle(mass, radius, 0.0, (0,0))
+	ballbody = pm.Body(mass, moment)
+	ballbody.position = Vec2d(890,300) 
+	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.7
-	ballform.color = pygame.color.THECOLORS["white"]
-	ballbody.position = 890, 300
+	ballform.color = THECOLORS["white"]
+	space.add(ballbody, ballform)
 	global ballbody
 	global ballform
-	space.add(ballbody, ballform)
-	ball.append(ballform)
+	return ballform
 	
+def changey(position):
+	return int(position.x), int(-position.y+720)
+	
+	
+def disegnapalla(ball):	
+	body = ball.body
+	position = body.position + ball.offset.cpvrotate(body.rotation_vector)
+	coordinates = changey(position)
+	r = ball.radius
+	pygame.draw.circle(window, THECOLORS["white"], coordinates, int(r), 0)
+
+def disegnabumper(ball):
+	body = ball.body
+	position = body.position + ball.offset.cpvrotate(body.rotation_vector)
+	coordinates = changey(position)
+	r = ball.radius
+	pygame.draw.circle(window, THECOLORS["white"], coordinates, int(r), 0)
+	
+def punteggio():
+		#Rettangoli punteggio 
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 50, 270, 52], 2)
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 162, 270, 52], 2)
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 274, 270, 52], 2)
+		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 386, 270, 52], 2)
+		
+		#Numeri
+		NUMEROUNO= fontsuino.render(("1"),True,THECOLORS["white"])
+		NUMERODUE= fontsuino.render(("2"),True,THECOLORS["white"])
+		NUMEROTRE= fontsuino.render(("3"),True,THECOLORS["white"])
+		NUMEROQUATTRO= fontsuino.render(("4"),True,THECOLORS["white"])
+		window.blit(NUMEROUNO,(150,15))
+		window.blit(NUMERODUE,(150,125))
+		window.blit(NUMEROTRE,(150,235))
+		window.blit(NUMEROQUATTRO,(150,345))
 
 def speed(springs):
 	if springs == 584:
@@ -30,16 +64,18 @@ import random,pygame,sys
 from pygame.locals import *
 from pygame.color import *
 import pymunk
+import pymunk as pm
 from pymunk import Vec2d
 import pymunk.pygame_util
 
 pygame.init()
 window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Night Mission")
-time1 = pygame.time.Clock()
+time = pygame.time.Clock()
 
+bumpers = []
 ### Physics stuff
-space = pymunk.Space()
+space = pm.Space()
 space.gravity = (0.0, -200.0)
 OptionsDraw = pymunk.pygame_util.DrawOptions(window)
 
@@ -73,9 +109,9 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (359,164), (359,257), 1)
 				,pymunk.Segment(space.static_body, (382,165), (359,165), 1)
 				,pymunk.Segment(space.static_body, (375,165), (359,178), 1)
-				,pymunk.Segment(space.static_body, (481,86), (376.8,86), 1)
-				,pymunk.Segment(space.static_body, (407,125), (382,166), 1)
-				,pymunk.Segment(space.static_body, (484,91), (410,125), 1)
+				,pymunk.Segment(space.static_body, (480,86), (376.8,86), 1)
+				,pymunk.Segment(space.static_body, (409,125), (382,166), 1)
+				,pymunk.Segment(space.static_body, (484,91), (409,125), 1)
 				,pymunk.Segment(space.static_body, (385,219), (385,257), 1)
 				,pymunk.Segment(space.static_body, (411,219), (411,257), 1)
 #~ *************************** LATO MOLLA BONUS ****************************
@@ -130,12 +166,16 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (505,655), (525.5,648), 1)
 				,pymunk.Segment(space.static_body, (526,635), (526,647), 1)
 				,pymunk.Segment(space.static_body, (526,635), (499,611), 1)
+				
+				,pymunk.Segment(space.static_body, (438,257), (498,123), 1)
+				,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
 ]
 
 
 for wall in staticwalls:
 	wall.elasticity = 0.7
 	wall.group = 1
+	wall.friction = 1
 	wall.color = pygame.color.THECOLORS["red"]
 space.add(staticwalls)
 
@@ -145,16 +185,7 @@ space.add(staticwalls)
 				#~ ,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
 #~ ]
 
-
-#~ bodybumper_r = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-#~ c = pymunk.Segment(bodybumper_r,(768,264), (709,133), 1)
-#~ c.elesticity = 10
-#~ c.color = pygame.color.THECOLORS["red"]
-#~ acab = pymunk.Segment(bodybumper_r,(438,257), (498,123), 1)
-#~ acab.elesticity = 10
-#~ acab.color = pygame.color.THECOLORS["red"]
-#~ space.add(c,acab)
-
+#~ space.add(lateralbumpers)
 
 ##bumpers
 for p in [(790,500), (650,320),(700,450)]:
@@ -164,6 +195,7 @@ for p in [(790,500), (650,320),(700,450)]:
     shape.elasticity = 2
     shape.color = pygame.color.THECOLORS["white"]
     space.add(shape)
+    bumpers.append(shape)
     
 for q in [(630,500),(550,350)]:
     body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
@@ -172,6 +204,7 @@ for q in [(630,500),(550,350)]:
     shape.elasticity = 2
     shape.color = pygame.color.THECOLORS["white"]
     space.add(shape)
+    bumpers.append(shape)
 
 
 ##Flipper
@@ -218,7 +251,7 @@ fontsuino = pygame.font.Font('FONT/ARCADECLASSIC.TTF',40)
 #Game
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
-ball = []
+balls = []
 start = True
 while 1:
 	while start:		
@@ -236,14 +269,13 @@ while 1:
 				sys.exit()
 			elif event.type == KEYDOWN and event.key == K_a: #Start
 				#Create the ball
-				newball()
-				
+				balls.append(newball())
 				#Power of spring
 				springs = 584
 				
 				running = True
 				pause = True
-				start = False
+				start = False			
 		window.blit(namegame,(473,70))
 		window.blit(quitgame,(490,230))
 		window.blit(startgame,(485,280))
@@ -281,7 +313,7 @@ while 1:
 		## Animazione molla bonus
 		if 825 <= ballbody.position[0] <= 875 and ballbody.position[1] < 154:
 			space.remove(ballbody, ballform)
-			ball.remove(ballform)
+			balls.remove(ballform)
 			
 			mass = 1
 			radius = 10
@@ -293,7 +325,10 @@ while 1:
 			ballform.color = pygame.color.THECOLORS["white"]
 			ballbody.position = 852, 154
 			space.add(ballbody, ballform)
-			ball.append(ballform)
+			balls.append(ballform)
+			for ball in balls:
+				disegnapalla(ball)
+			punteggio()
 			space.debug_draw(OptionsDraw)
 			pygame.display.update()
 			go = True
@@ -301,7 +336,7 @@ while 1:
 				for event in pygame.event.get():
 					if event.type == MOVEEVENT:
 						space.remove(ballbody, ballform)
-						ball.remove(ballform)
+						balls.remove(ballform)
 						
 						mass = 1
 						radius = 10
@@ -313,11 +348,11 @@ while 1:
 						ballform.color = pygame.color.THECOLORS["white"]
 						ballbody.position = 852, 154
 						space.add(ballbody, ballform)
-						ball.append(ballform)
+						balls.append(ballform)
 						
 						ballbody.apply_impulse_at_local_point((Vec2d((0,700))))
 						go = False
-						
+					
 		### Draw stuff
 		space.debug_draw(OptionsDraw)
 
@@ -327,36 +362,29 @@ while 1:
 		
 		#Respawn balls
 		if ballbody.position[1] <= 12 and 333 <= ballbody.position[0] <= 830:
-			space.remove(ballbody, ballform)
-			ball.remove(ballform)
+			balls.remove(ballform)
+			space.remove(ballbody,ballform)
 			
 			#Create new ball
-			newball()
+			balls.append(newball())
 
+		for ball in balls:
+			disegnapalla(ball)
+		
+		for bumper in bumpers:
+			disegnabumper(bumper)
 		### Update physics
-		dt = 2/60.0/5.5
+		dt = 1/50.0/3
 		for x in range(9):
 			space.step(dt)
 		
-		#Rettangoli punteggio 
-		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 50, 270, 52], 2)
-		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 162, 270, 52], 2)
-		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 274, 270, 52], 2)
-		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 386, 270, 52], 2)
-		
-		#Numeri
-		NUMEROUNO= fontsuino.render(("1"),True,THECOLORS["white"])
-		NUMERODUE= fontsuino.render(("2"),True,THECOLORS["white"])
-		NUMEROTRE= fontsuino.render(("3"),True,THECOLORS["white"])
-		NUMEROQUATTRO= fontsuino.render(("4"),True,THECOLORS["white"])
-		window.blit(NUMEROUNO,(150,15))
-		window.blit(NUMERODUE,(150,125))
-		window.blit(NUMEROTRE,(150,235))
-		window.blit(NUMEROQUATTRO,(150,345))
-		
+		punteggio()
+		#print(ballbody.position)
+		#ballbody.apply_force_at_local_point((50,200),(20,0))
+
 		### Flip screen
-		pygame.display.update()
-		time1.tick(60)
+		time.tick(30)
+		pygame.display.flip()
 	while pause:
 		window.fill(THECOLORS["black"])
 		font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
@@ -374,7 +402,7 @@ while 1:
 				sys.exit()
 			elif event.type == KEYDOWN and event.key == K_r: #Restart
 				space.remove(ballbody, ballform)
-				ball.remove(ballform)
+				balls.remove(ballform)
 				running = False
 				pause = False
 				start = True
