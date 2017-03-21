@@ -11,7 +11,9 @@ def newball():
 	global ballbody
 	global ballform
 	return ballform
-	
+
+#Diego
+
 def changey(position):
 	return int(position.x), int(-position.y+720)
 
