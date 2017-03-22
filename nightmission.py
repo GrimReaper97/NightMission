@@ -13,7 +13,9 @@ def newball():
 	global ballform
 	return ballform
 
-#Diego
+
+def changey(position):
+	return int(position.x), int(-position.y+720)
 
 def calcolaraggio(gradi):
 	return gradi/180.0 * math.pi
@@ -57,7 +59,7 @@ def disegnabumper(ball):
 	r = ball.radius
 	pygame.draw.circle(window, THECOLORS["white"], coordinates, int(r), 0)
 	
-def punteggio():
+def punteggiodesign():
 		#Rettangoli punteggio 
 		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 50, 270, 52], 2)
 		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 162, 270, 52], 2)
@@ -74,7 +76,24 @@ def punteggio():
 		window.blit(NUMEROTRE,(150,235))
 		window.blit(NUMEROQUATTRO,(150,345))
 
-def letters():
+def speed(springs):
+	if springs == 584:
+		power = 700
+	elif springs == 614:
+		power = 500
+	elif springs == 644:
+		power = 400
+	elif springs == 674:
+		power = 320
+	elif springs == 704:
+		power = 200
+	return (power)
+
+def printscore(letters,scores):
+	printscore = fontsuino.render(("%s"%scores),True,THECOLORS["white"])
+	window.blit(printscore,(40,55))
+		
+def printletters():
 	lettera_N = fontsmall.render(("N"),True,THECOLORS["white"])
 	lettera_I = fontsmall.render(("I"),True,THECOLORS["white"])
 	lettera_G = fontsmall.render(("G"),True,THECOLORS["white"])
@@ -91,7 +110,33 @@ def letters():
 	lettera_C = fontsmallest.render(("C"),True,THECOLORS["white"])
 	lettera_D2 = fontsmallest.render(("D"),True,THECOLORS["white"])
 
-
+	if letters["n"] == True:
+		window.blit(lettera_N,(620,140))
+	if letters["i"] == True:
+		window.blit(lettera_I,(659,135))
+	if letters["g"] == True:
+		window.blit(lettera_G,(698,132))
+	if letters["h"] == True:
+		window.blit(lettera_H,(736,135))
+	if letters["t"] == True:
+		window.blit(lettera_T,(776,140))
+	if letters["d"] == True:
+		window.blit(lettera_D,(340,460))
+	if letters["r"] == True:
+		window.blit(lettera_R,(366,460))
+	if letters["o"] == True:
+		window.blit(lettera_O,(392,460))
+	if letters["p"] == True:
+		window.blit(lettera_P,(417,460))
+	if letters["a"] == True:
+		window.blit(lettera_A,(795,325))
+	if letters["b"] == True:
+		window.blit(lettera_B,(818,347))
+	if letters["c"] == True:
+		window.blit(lettera_C,(492,38))
+	if letters["d2"] == True:		
+		window.blit(lettera_D2,(517,44))
+    
 	window.blit(lettera_N,(620,140))
 	window.blit(lettera_I,(659,135))
 	window.blit(lettera_G,(698,132))
@@ -124,7 +169,7 @@ def speed(springs):
 def drawsprings(springs):
 	pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,584), 30)
 
-import random,pygame,sys,math
+import random,pygame,sys,math,score
 from pygame.locals import *
 from pygame.color import *
 import pymunk
@@ -142,6 +187,7 @@ gruppi = { "palla": 1,
 			"bumperleft": 2,
 			"bumperight": 3
 }
+
 ### Physics stuff
 space = pm.Space()
 space.gravity = (0.0, -180.0)
@@ -175,9 +221,9 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 #~ ************************** LATO "D R O P" **********************************
 				,pymunk.Segment(space.static_body, (376.8,86), (376.8,165), 1)
 				,pymunk.Segment(space.static_body, (359,164), (359,257), 1)
-				,pymunk.Segment(space.static_body, (382,166), (359,165), 1)
+				,pymunk.Segment(space.static_body, (382,165), (359,165), 1)
 				,pymunk.Segment(space.static_body, (375,165), (359,178), 1)
-				,pymunk.Segment(space.static_body, (470,86), (376.8,86), 1)
+				,pymunk.Segment(space.static_body, (480,86), (376.8,86), 1)
 				,pymunk.Segment(space.static_body, (409,125), (382,166), 1)
 				,pymunk.Segment(space.static_body, (484,91), (409,125), 1)
 				,pymunk.Segment(space.static_body, (385,219), (385,257), 1)
@@ -235,18 +281,9 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (526,635), (526,647), 1)
 				,pymunk.Segment(space.static_body, (526,635), (499,611), 1)
 				
-
-				#,pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-				#,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-				
 				         #~ ********ROLLINO*************
 				,pymunk.Segment(space.static_body, (574,500), (574,460), 2)
-
 ]
-
-#segmentbumper = [pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-				#,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-#]
 
 bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
 bumperleft.elasticy = 3
@@ -292,22 +329,10 @@ for q in [(630,500),(550,350)]:
 	space.add(shape)
 	bumpers.append(shape)
 
-##bumperleft
-#listaporcodemonio = [[443,245]]
-#for suca in range(40):
-	#for suca in listaporcodemonio:
-		#body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-		#body.position = suca
-		#shape = pymunk.Circle(body, 2)
-		#shape.elasticity = 3
-		#shape.color = pygame.color.THECOLORS["white"]
-		#space.add(shape)
-		#bumpers.append(shape)
-		#listaporcodemonio[0][0] += 1.4
-		#listaporcodemonio[0][1] -= 3
+
+#FLIPPER
 
 
-##Flipper
 rbar = [(27,-16), (-90, 0), (15,10)]
 lbar = [(-27,-16), (90, 0), (-5,10)]
 mass = 100
@@ -353,6 +378,25 @@ fontsmallest = pygame.font.Font('FONT/ARCADECLASSIC.TTF',25)
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
 balls = []
+letters = {
+	"d": True,
+	"r": True,
+	"o": True,
+	"p": True,
+	"f": True,
+	"l": True,
+	"y": True,
+	"a": True,
+	"b": True,
+	"c": True,
+	"d2": True,
+	"n": True,
+	"i": True,
+	"g": True,
+	"h": True,
+	"t": True
+}
+scores = 0
 start = True
 while 1:
 	while start:		
@@ -413,7 +457,7 @@ while 1:
 		### Springs
 		pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,springs), 30)
 		## Animazione molla bonus
-		if 825 <= ballbody.position[0] <= 875 and ballbody.position[1] < 154:
+		if 825 <= ballbody.position.x <= 875 and ballbody.position.y < 154:
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
 			
@@ -429,7 +473,7 @@ while 1:
 			balls.append(ballform)
 			for ball in balls:
 				disegnapalla(ball)
-			punteggio()
+			punteggiodesign()
 			space.debug_draw(OptionsDraw)
 			pygame.display.update()
 			go = True
@@ -451,8 +495,10 @@ while 1:
 						
 						ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
 						go = False
+
 #*** MOLLA AEROPORTO DI BIRGI****
 		if 500 <= ballbody.position.x <= 550 and 450 < ballbody.position.y < 500:
+      punteggiodesign()
 			punteggio()
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
@@ -467,9 +513,7 @@ while 1:
 			space.add(ballbody, ballform)
 			balls.append(ballform)
 			ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
-
-
-
+      
 		### Draw stuff
 		space.debug_draw(OptionsDraw)
 
@@ -478,7 +522,7 @@ while 1:
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
 		
 		#Respawn balls
-		if ballbody.position[1] <= 12 and 333 <= ballbody.position[0] <= 830:
+		if ballbody.position.y <= 12 and 333 <= ballbody.position.x <= 830:
 			balls.remove(ballform)
 			space.remove(ballbody,ballform)
 			
@@ -490,15 +534,17 @@ while 1:
 		
 		for bumper in bumpers:
 			disegnabumper(bumper)
-		
-
+			
 		### Update physics
 		dt = 1/50.0/3
 		for x in range(9):
 			space.step(dt)
-		
-		punteggio()
-		letters()
+
+			
+		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
+		punteggiodesign()
+		printscore(letters,scores)
+		printletters()
 
 		savitarleft = space.add_collision_handler(
 		gruppi["palla"],
@@ -511,13 +557,14 @@ while 1:
 		gruppi["bumperight"]
 		)
 		savitaright.post_solve = angolobumperight
+
 		### Flip screen
 		time.tick(30)
 		pygame.display.flip()
 	while pause:
 		window.fill(THECOLORS["black"])
-		font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
-		fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
+		#~ font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
+		#~ fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
 		written = font.render(("Pause"),True,THECOLORS["white"])
 		writtensmall = fontsmall.render(("Press q for quit the game"),True,THECOLORS["white"])
 		resume = fontsmall.render(("Press esc for resume the game"),True,THECOLORS["white"])
