@@ -6,6 +6,7 @@ def newball():
 	ballbody.position = Vec2d(890,300) 
 	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.5
+	ballform.collision_type = gruppi["palla"]
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
 	global ballbody
@@ -13,6 +14,31 @@ def newball():
 	return ballform
 
 #Diego
+
+def calcolaraggio(gradi):
+	return gradi/180.0 * math.pi
+
+def angolobumperleft(arbiter,space,data):
+	center = (445,540)
+	radius = 70
+	(x,y) = center
+	inizio = -40
+	fine = 90
+	inizio = calcolaraggio(inizio)
+	fine = calcolaraggio(fine)
+	rect = (x-radius,y-radius,radius*2,radius*2)
+	pygame.draw.arc(window, pygame.color.THECOLORS["white"], rect, inizio, fine, 20)
+
+def angolobumperight(arbiter,space,data):
+	center = (749,540)
+	radius = 70
+	(x,y) = center
+	inizio = 90
+	fine = -135
+	inizio = calcolaraggio(inizio)
+	fine = calcolaraggio(fine)
+	rect = (x-radius,y-radius,radius*2,radius*2)
+	pygame.draw.arc(window, pygame.color.THECOLORS["white"], rect, inizio, fine, 20)
 
 def changey(position):
 	return int(position.x), int(-position.y+720)
@@ -95,7 +121,10 @@ def speed(springs):
 		power = 1550
 	return (power)
 
-import random,pygame,sys
+def drawsprings(springs):
+	pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,584), 30)
+
+import random,pygame,sys,math
 from pygame.locals import *
 from pygame.color import *
 import pymunk
@@ -109,6 +138,10 @@ pygame.display.set_caption("Night Mission")
 time = pygame.time.Clock()
 
 bumpers = []
+gruppi = { "palla": 1,
+			"bumperleft": 2,
+			"bumperight": 3
+}
 ### Physics stuff
 space = pm.Space()
 space.gravity = (0.0, -180.0)
@@ -202,13 +235,34 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (526,635), (526,647), 1)
 				,pymunk.Segment(space.static_body, (526,635), (499,611), 1)
 				
-				,pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-				,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
+
+				#,pymunk.Segment(space.static_body, (438,257), (498,123), 1)
+				#,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
 				
 				         #~ ********ROLLINO*************
 				,pymunk.Segment(space.static_body, (574,500), (574,460), 2)
 
 ]
+
+#segmentbumper = [pymunk.Segment(space.static_body, (438,257), (498,123), 1)
+				#,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
+#]
+
+bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
+bumperleft.elasticy = 3
+bumperleft.elasticity = 3
+bumperleft.group = 1
+bumperleft.friction = 1
+bumperleft.collision_type = gruppi["bumperleft"]
+bumperleft.color = pygame.color.THECOLORS["white"]
+bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
+bumperight.elasticy = 3
+bumperight.elasticity = 3
+bumperight.group = 1
+bumperight.friction = 1
+bumperight.collision_type = gruppi["bumperight"]
+bumperight.color = pygame.color.THECOLORS["white"]
+space.add(bumperleft,bumperight)
 
 
 for wall in staticwalls:
@@ -218,20 +272,13 @@ for wall in staticwalls:
 	wall.color = pygame.color.THECOLORS["white"]
 space.add(staticwalls)
 
-
-##bumpers laterali
-#~ lateralbumpers = [pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-				#~ ,pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-#~ ]
-
-#~ space.add(lateralbumpers)
-
 ##bumpers
 for p in [(790,500), (650,320),(700,450)]:
 	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 	body.position = p
 	shape = pymunk.Circle(body, 14)
 	shape.elasticity = 3
+	shape.friction = 1
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
@@ -244,6 +291,20 @@ for q in [(630,500),(550,350)]:
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
+
+##bumperleft
+#listaporcodemonio = [[443,245]]
+#for suca in range(40):
+	#for suca in listaporcodemonio:
+		#body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+		#body.position = suca
+		#shape = pymunk.Circle(body, 2)
+		#shape.elasticity = 3
+		#shape.color = pygame.color.THECOLORS["white"]
+		#space.add(shape)
+		#bumpers.append(shape)
+		#listaporcodemonio[0][0] += 1.4
+		#listaporcodemonio[0][1] -= 3
 
 
 ##Flipper
@@ -287,6 +348,7 @@ font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
 fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
 fontsuino = pygame.font.Font('FONT/ARCADECLASSIC.TTF',40)
 fontsmallest = pygame.font.Font('FONT/ARCADECLASSIC.TTF',25)
+
 #Game
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
@@ -345,10 +407,11 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_SPACE: #and 146 <= ballbody.position[1] <= 147 and ballbody.position[0] == 890.0:
 				power = speed(springs)
 				ballbody.apply_impulse_at_local_point((Vec2d((0,power))))
+				drawsprings(springs)
+				springs = 584
 
 		### Springs
 		pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,springs), 30)
-		
 		## Animazione molla bonus
 		if 825 <= ballbody.position[0] <= 875 and ballbody.position[1] < 154:
 			space.remove(ballbody, ballform)
@@ -436,8 +499,18 @@ while 1:
 		
 		punteggio()
 		letters()
-		
 
+		savitarleft = space.add_collision_handler(
+		gruppi["palla"],
+		gruppi["bumperleft"]
+		)
+		savitarleft.post_solve = angolobumperleft
+
+		savitaright = space.add_collision_handler(
+		gruppi["palla"],
+		gruppi["bumperight"]
+		)
+		savitaright.post_solve = angolobumperight
 		### Flip screen
 		time.tick(30)
 		pygame.display.flip()
