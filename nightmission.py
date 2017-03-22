@@ -281,20 +281,20 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (526,635), (526,647), 1)
 				,pymunk.Segment(space.static_body, (526,635), (499,611), 1)
 				
-				         #~ ********ROLLINO*************
+				#~ ********ROLLINO*************
 				,pymunk.Segment(space.static_body, (574,500), (574,460), 2)
 ]
 
 bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-bumperleft.elasticy = 3
-bumperleft.elasticity = 3
+bumperleft.elasticy = 2
+bumperleft.elasticity = 2
 bumperleft.group = 1
 bumperleft.friction = 1
 bumperleft.collision_type = gruppi["bumperleft"]
 bumperleft.color = pygame.color.THECOLORS["white"]
 bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-bumperight.elasticy = 3
-bumperight.elasticity = 3
+bumperight.elasticy = 2
+bumperight.elasticity = 2
 bumperight.group = 1
 bumperight.friction = 1
 bumperight.collision_type = gruppi["bumperight"]
@@ -334,13 +334,13 @@ for q in [(630,500),(550,350)]:
 
 
 rbar = [(27,-16), (-90, 0), (15,10)]
-lbar = [(-27,-16), (90, 0), (-5,10)]
+lbar = [(-27,-16), (90, 0), (-15,10)]
 mass = 100
 mo = pymunk.moment_for_poly(mass, rbar)
 
 # right flipper
 r_bar_body = pymunk.Body(mass, mo)
-r_bar_body.position = 710, 76
+r_bar_body.position = 710, 74
 r_bar_form = pymunk.Poly(r_bar_body, rbar)
 r_bar_form.color = pygame.color.THECOLORS["white"]
 space.add(r_bar_body, r_bar_form)
@@ -354,7 +354,7 @@ space.add(a, l)
 
 # left flipper
 l_bar_body = pymunk.Body(mass, mo)
-l_bar_body.position = 490, 76
+l_bar_body.position = 502, 74
 l_bar_form = pymunk.Poly(l_bar_body, lbar)
 l_bar_form.color = pygame.color.THECOLORS["white"]
 space.add(l_bar_body, l_bar_form)
@@ -498,8 +498,7 @@ while 1:
 
 #*** MOLLA AEROPORTO DI BIRGI****
 		if 500 <= ballbody.position.x <= 550 and 450 < ballbody.position.y < 500:
-      punteggiodesign()
-			punteggio()
+			punteggiodesign()
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
 			mass = 1.5
@@ -517,8 +516,8 @@ while 1:
 		### Draw stuff
 		space.debug_draw(OptionsDraw)
 
-		r_bar_body.position = 710, 76
-		l_bar_body.position = 490, 76
+		r_bar_body.position = 710, 74
+		l_bar_body.position = 502, 74
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
 		
 		#Respawn balls
