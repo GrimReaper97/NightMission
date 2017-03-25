@@ -6,59 +6,33 @@ def newball():
 	ballbody.position = Vec2d(890,300) 
 	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.5
-	ballform.collision_type = gruppi["palla"]
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
 	global ballbody
 	global ballform
 	return ballform
 
-
 def changey(position):
 	return int(position.x), int(-position.y+720)
 
-def calcolaraggio(gradi):
-	return gradi/180.0 * math.pi
-
-def angolobumperleft(arbiter,space,data):
-	center = (445,540)
-	radius = 70
-	(x,y) = center
-	inizio = -40
-	fine = 90
-	inizio = calcolaraggio(inizio)
-	fine = calcolaraggio(fine)
-	rect = (x-radius,y-radius,radius*2,radius*2)
-	pygame.draw.arc(window, pygame.color.THECOLORS["white"], rect, inizio, fine, 20)
-
-def angolobumperight(arbiter,space,data):
-	center = (749,540)
-	radius = 70
-	(x,y) = center
-	inizio = 90
-	fine = -135
-	inizio = calcolaraggio(inizio)
-	fine = calcolaraggio(fine)
-	rect = (x-radius,y-radius,radius*2,radius*2)
-	pygame.draw.arc(window, pygame.color.THECOLORS["white"], rect, inizio, fine, 20)
-
-def changey(position):
-	return int(position.x), int(-position.y+720)
-
-def disegnapalla(ball):	
+def draw():
+	for ball in balls:
+		disegnapalla(ball)
+	for bumper in bumpers:
+		disegnabumper(bumper)
+def disegnapalla(ball):
 	body = ball.body
 	position = body.position + ball.offset.cpvrotate(body.rotation_vector)
 	coordinates = changey(position)
 	r = ball.radius
 	pygame.draw.circle(window, THECOLORS["white"], coordinates, int(r), 0)
-
 def disegnabumper(ball):
 	body = ball.body
 	position = body.position + ball.offset.cpvrotate(body.rotation_vector)
 	coordinates = changey(position)
 	r = ball.radius
 	pygame.draw.circle(window, THECOLORS["white"], coordinates, int(r), 0)
-	
+
 def punteggiodesign():
 		#Rettangoli punteggio 
 		pygame.draw.rect(window,pygame.color.THECOLORS["white"] ,[30, 50, 270, 52], 2)
@@ -75,36 +49,22 @@ def punteggiodesign():
 		window.blit(NUMERODUE,(150,125))
 		window.blit(NUMEROTRE,(150,235))
 		window.blit(NUMEROQUATTRO,(150,345))
-
-def speed(springs):
-	if springs == 584:
-		power = 700
-	elif springs == 614:
-		power = 500
-	elif springs == 644:
-		power = 400
-	elif springs == 674:
-		power = 320
-	elif springs == 704:
-		power = 200
-	return (power)
-
 def printscore(letters,scores):
 	printscore = fontsuino.render(("%s"%scores),True,THECOLORS["white"])
 	window.blit(printscore,(40,55))
-		
+
 def printletters():
 	lettera_N = fontsmall.render(("N"),True,THECOLORS["white"])
 	lettera_I = fontsmall.render(("I"),True,THECOLORS["white"])
 	lettera_G = fontsmall.render(("G"),True,THECOLORS["white"])
 	lettera_H = fontsmall.render(("H"),True,THECOLORS["white"])
 	lettera_T = fontsmall.render(("T"),True,THECOLORS["white"])
-	
+
 	lettera_D = fontsmall.render(("D"),True,THECOLORS["white"])
 	lettera_R = fontsmall.render(("R"),True,THECOLORS["white"])
 	lettera_O = fontsmall.render(("O"),True,THECOLORS["white"])
 	lettera_P = fontsmall.render(("P"),True,THECOLORS["white"])
-	
+
 	lettera_A = fontsmall.render(("A"),True,THECOLORS["white"])
 	lettera_B = fontsmall.render(("B"),True,THECOLORS["white"])
 	lettera_C = fontsmallest.render(("C"),True,THECOLORS["white"])
@@ -136,22 +96,6 @@ def printletters():
 		window.blit(lettera_C,(492,38))
 	if letters["d2"] == True:		
 		window.blit(lettera_D2,(517,44))
-    
-	window.blit(lettera_N,(620,140))
-	window.blit(lettera_I,(659,135))
-	window.blit(lettera_G,(698,132))
-	window.blit(lettera_H,(736,135))
-	window.blit(lettera_T,(776,140))
-	
-	window.blit(lettera_D,(340,460))
-	window.blit(lettera_R,(366,460))
-	window.blit(lettera_O,(392,460))
-	window.blit(lettera_P,(417,460))
-	
-	window.blit(lettera_A,(795,325))
-	window.blit(lettera_B,(818,347))
-	window.blit(lettera_C,(492,38))
-	window.blit(lettera_D2,(517,44))
 
 def speed(springs):
 	if springs == 584:
@@ -165,14 +109,18 @@ def speed(springs):
 	elif springs == 704:
 		power = 1550
 	return (power)
-
-def drawsprings(springs):
+def drawsprings():
 	pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,584), 30)
 
-import random,pygame,sys,math,score
+def drawall():
+	punteggiodesign()
+	printscore(letters,scores)
+	printletters()
+	draw()
+
+import random,pygame,sys,pymunk,score
 from pygame.locals import *
 from pygame.color import *
-import pymunk
 import pymunk as pm
 from pymunk import Vec2d
 import pymunk.pygame_util
@@ -182,13 +130,7 @@ window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Night Mission")
 time = pygame.time.Clock()
 
-bumpers = []
-gruppi = { "palla": 1,
-			"bumperleft": 2,
-			"bumperight": 3
-}
-
-### Physics stuff
+#Physics Stuff
 space = pm.Space()
 space.gravity = (0.0, -180.0)
 OptionsDraw = pymunk.pygame_util.DrawOptions(window)
@@ -281,26 +223,9 @@ staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (526,635), (526,647), 1)
 				,pymunk.Segment(space.static_body, (526,635), (499,611), 1)
 				
-				#~ ********ROLLINO*************
+#~ *********************************ROLLINO***************************************
 				,pymunk.Segment(space.static_body, (574,500), (574,460), 2)
 ]
-
-bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-bumperleft.elasticy = 2
-bumperleft.elasticity = 2
-bumperleft.group = 1
-bumperleft.friction = 1
-bumperleft.collision_type = gruppi["bumperleft"]
-bumperleft.color = pygame.color.THECOLORS["white"]
-bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-bumperight.elasticy = 2
-bumperight.elasticity = 2
-bumperight.group = 1
-bumperight.friction = 1
-bumperight.collision_type = gruppi["bumperight"]
-bumperight.color = pygame.color.THECOLORS["white"]
-space.add(bumperleft,bumperight)
-
 
 for wall in staticwalls:
 	wall.elasticity = 0.7
@@ -309,7 +234,8 @@ for wall in staticwalls:
 	wall.color = pygame.color.THECOLORS["white"]
 space.add(staticwalls)
 
-##bumpers
+##Bumpers
+bumpers = []
 for p in [(790,500), (650,320),(700,450)]:
 	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 	body.position = p
@@ -319,7 +245,6 @@ for p in [(790,500), (650,320),(700,450)]:
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
-
 for q in [(630,500),(550,350)]:
 	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 	body.position = q
@@ -329,16 +254,26 @@ for q in [(630,500),(550,350)]:
 	space.add(shape)
 	bumpers.append(shape)
 
+bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
+bumperleft.elasticity = 2
+bumperleft.group = 1
+bumperleft.friction = 1
+bumperleft.color = pygame.color.THECOLORS["white"]
+bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
+bumperight.elasticity = 2
+bumperight.group = 1
+bumperight.friction = 1
+bumperight.color = pygame.color.THECOLORS["white"]
+space.add(bumperleft,bumperight)
 
 #FLIPPER
-
 
 rbar = [(27,-16), (-90, 0), (15,10)]
 lbar = [(-27,-16), (90, 0), (-15,10)]
 mass = 100
 mo = pymunk.moment_for_poly(mass, rbar)
 
-# right flipper
+#Flipper Right
 r_bar_body = pymunk.Body(mass, mo)
 r_bar_body.position = 710, 74
 r_bar_form = pymunk.Poly(r_bar_body, rbar)
@@ -347,12 +282,11 @@ space.add(r_bar_body, r_bar_form)
 
 r_bar_union_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 r_bar_union_body.position = r_bar_body.position 
-a = pymunk.PinJoint(r_bar_body, r_bar_union_body, (0,0), (0,0))
-#todo: tweak values of spring better
-l = pymunk.DampedRotarySpring(r_bar_body, r_bar_union_body, 0.35, 9000000,999999)
-space.add(a, l)
+union = pymunk.PinJoint(r_bar_body, r_bar_union_body, (0,0), (0,0))
+rotary = pymunk.DampedRotarySpring(r_bar_body, r_bar_union_body, 0.35, 9000000,999999)
+space.add(union, rotary)
 
-# left flipper
+#Flipper Right
 l_bar_body = pymunk.Body(mass, mo)
 l_bar_body.position = 502, 74
 l_bar_form = pymunk.Poly(l_bar_body, lbar)
@@ -361,9 +295,9 @@ space.add(l_bar_body, l_bar_form)
 
 l_bar_union_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 l_bar_union_body.position = l_bar_body.position 
-a = pymunk.PinJoint(l_bar_body, l_bar_union_body, (0,0), (0,0))
-l = pymunk.DampedRotarySpring(l_bar_body, l_bar_union_body, -0.35, 9000000,999999)
-space.add(a, l)
+union = pymunk.PinJoint(l_bar_body, l_bar_union_body, (0,0), (0,0))
+rotary = pymunk.DampedRotarySpring(l_bar_body, l_bar_union_body, -0.35, 9000000,999999)
+space.add(union, rotary)
 
 r_bar_form.group = l_bar_form.group = 1
 r_bar_form.elasticity = l_bar_form.elasticity = 0.7
@@ -374,9 +308,13 @@ fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
 fontsuino = pygame.font.Font('FONT/ARCADECLASSIC.TTF',40)
 fontsmallest = pygame.font.Font('FONT/ARCADECLASSIC.TTF',25)
 
-#Game
+#Event
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
+porco,ti = pygame.USEREVENT+1,500
+pygame.time.set_timer(porco, ti)
+chiave = False
+#Game
 balls = []
 letters = {
 	"d": True,
@@ -399,12 +337,12 @@ letters = {
 scores = 0
 start = True
 while 1:
-	while start:		
-		#Menu start
+	while start:
+		#Menu Start
 		window.fill(THECOLORS["black"])
 		namegame = font.render(("Night Mission"),True,THECOLORS["white"])
-		quitgame = fontsmall.render(("Press q for quit the game"),True,THECOLORS["white"])
-		startgame = fontsmall.render(("Press a for start the game"),True,THECOLORS["white"])
+		quitgame = fontsmall.render(("Press q to quit the game"),True,THECOLORS["white"])
+		startgame = fontsmall.render(("Press a to start the game"),True,THECOLORS["white"])
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				pygame.quit()
@@ -417,10 +355,10 @@ while 1:
 				balls.append(newball())
 				#Power of spring
 				springs = 584
-				
+
 				running = True
 				pause = True
-				start = False			
+				start = False
 		window.blit(namegame,(473,70))
 		window.blit(quitgame,(490,230))
 		window.blit(startgame,(485,280))
@@ -433,8 +371,8 @@ while 1:
 				pygame.quit()
 				sys.exit()
 			elif event.type == MOUSEBUTTONDOWN:
-				x,y = event.pos
-				print(x,y)
+				x,y = event.pos #
+				print(x,y) #
 			elif event.type == KEYDOWN and event.key == K_ESCAPE:
 				pause = True
 				running = False
@@ -451,54 +389,47 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_SPACE: #and 146 <= ballbody.position[1] <= 147 and ballbody.position[0] == 890.0:
 				power = speed(springs)
 				ballbody.apply_impulse_at_local_point((Vec2d((0,power))))
-				drawsprings(springs)
+				drawsprings()
 				springs = 584
+			elif event.type == porco and chiave == True:
+				print("evento")
+				pygame.draw.line(window,THECOLORS["white"],(550,230-up),(550,250+up),3)
+				pygame.draw.line(window,THECOLORS["white"],(557,230-up),(557,250+up),3)
+				pygame.draw.line(window,THECOLORS["white"],(564,230-up),(564,250+up),3)
+				up += 0.2
 
-		### Springs
-		pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,springs), 30)
-		## Animazione molla bonus
+		#Animazione Molla Bonus
 		if 825 <= ballbody.position.x <= 875 and ballbody.position.y < 154:
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
-			
-			mass = 1.5
-			radius = 10.3
-			inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
-			ballbody = pymunk.Body(mass, inertia, body_type=pymunk.Body.STATIC)
-			ballform = pymunk.Circle(ballbody, radius, (0,0))
-			ballform.elasticity = 0.7
-			ballform.color = pygame.color.THECOLORS["white"]
-			ballbody.position = 852, 154
-			space.add(ballbody, ballform)
-			balls.append(ballform)
-			for ball in balls:
-				disegnapalla(ball)
-			punteggiodesign()
+
+			pygame.draw.circle(window, THECOLORS["white"], (852,566), 10, 0)
+			drawall()
+			draw()
+			drawsprings()
 			space.debug_draw(OptionsDraw)
 			pygame.display.update()
 			go = True
 			while go:
 				for event in pygame.event.get():
 					if event.type == MOVEEVENT:
-						space.remove(ballbody, ballform)
-						balls.remove(ballform)
-						mass = 1.5
-						radius = 10.3
+						mass = 1
+						radius = 10
 						inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
 						ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
+
 						ballform = pymunk.Circle(ballbody, radius, (0,0))
 						ballform.elasticity = 0.7
 						ballform.color = pygame.color.THECOLORS["white"]
 						ballbody.position = 852, 154
 						space.add(ballbody, ballform)
 						balls.append(ballform)
-						
-						ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
+
+						ballbody.apply_impulse_at_local_point((Vec2d((0,500))))
 						go = False
 
-#*** MOLLA AEROPORTO DI BIRGI****
+		#*** MOLLA AEROPORTO DI BIRGI****
 		if 500 <= ballbody.position.x <= 550 and 450 < ballbody.position.y < 500:
-			punteggiodesign()
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
 			mass = 1.5
@@ -512,62 +443,42 @@ while 1:
 			space.add(ballbody, ballform)
 			balls.append(ballform)
 			ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
-      
-		### Draw stuff
+
+		#Springs
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,springs), 30)
+
+		#Draw Stuff
 		space.debug_draw(OptionsDraw)
 
 		r_bar_body.position = 710, 74
 		l_bar_body.position = 502, 74
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
-		
-		#Respawn balls
+
+		#Respawn Ball
 		if ballbody.position.y <= 12 and 333 <= ballbody.position.x <= 830:
 			balls.remove(ballform)
 			space.remove(ballbody,ballform)
-			
+
 			#Create new ball
 			balls.append(newball())
 
-		for ball in balls:
-			disegnapalla(ball)
-		
-		for bumper in bumpers:
-			disegnabumper(bumper)
-			
-		### Update physics
+		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
+		drawall()
+
+		#Update Physics
 		dt = 1/50.0/3
 		for x in range(9):
 			space.step(dt)
 
-			
-		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
-		punteggiodesign()
-		printscore(letters,scores)
-		printletters()
-
-		savitarleft = space.add_collision_handler(
-		gruppi["palla"],
-		gruppi["bumperleft"]
-		)
-		savitarleft.post_solve = angolobumperleft
-
-		savitaright = space.add_collision_handler(
-		gruppi["palla"],
-		gruppi["bumperight"]
-		)
-		savitaright.post_solve = angolobumperight
-
-		### Flip screen
+		#Flip Screen
 		time.tick(30)
 		pygame.display.flip()
 	while pause:
 		window.fill(THECOLORS["black"])
-		#~ font = pygame.font.Font('FONT/ARCADECLASSIC.TTF',60)
-		#~ fontsmall = pygame.font.Font('FONT/ARCADECLASSIC.TTF',30)
 		written = font.render(("Pause"),True,THECOLORS["white"])
-		writtensmall = fontsmall.render(("Press q for quit the game"),True,THECOLORS["white"])
-		resume = fontsmall.render(("Press esc for resume the game"),True,THECOLORS["white"])
-		restart = fontsmall.render(("Press r for restart the game"),True,THECOLORS["white"])
+		writtensmall = fontsmall.render(("Press q to quit the game"),True,THECOLORS["white"])
+		resume = fontsmall.render(("Press esc to resume the game"),True,THECOLORS["white"])
+		restart = fontsmall.render(("Press r to restart the game"),True,THECOLORS["white"])
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				pygame.quit()
