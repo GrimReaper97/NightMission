@@ -135,23 +135,23 @@ def drawall():
 	draw()
 
 def drawroll(x,y): 
-	riga1 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (550,255), (550,227), 1)
-	riga2 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (557,255), (557,227), 1)
-	riga3 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (565,255), (565,227), 1)
-	pygame.draw.line(window, pygame.color.THECOLORS["red"], (542,242), (572,242), 1)
-	pygame.draw.line(window, pygame.color.THECOLORS["red"], (384,155), (418,155), 1)
-	riga4 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (396,163), (396,149), 1)
-	riga5 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (401,163), (401,149), 1)
-	riga6 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (406,163), (406,149), 1)
+	riga1 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (550,255), (550,227), 1)
+	riga2 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (557,255), (557,227), 1)
+	riga3 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (565,255), (565,227), 1)
+	pygame.draw.line(window, pygame.color.THECOLORS["white"], (542,242), (572,242), 1)
+	pygame.draw.line(window, pygame.color.THECOLORS["white"], (384,155), (418,155), 1)
+	riga4 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (396,163), (396,149), 1)
+	riga5 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (401,163), (401,149), 1)
+	riga6 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (406,163), (406,149), 1)
 	if 540 <= x <= 570 and 480 < y < 500:
 		yup = 0
 		ydown = 0
 		for x in range(1,15):
 			yup += 1.5
 			ydown += 1.5
-			riga1 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (550,255+yup), (550,227-ydown), 1)
-			riga2 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (557,255+yup), (557,227-ydown), 1)
-			riga3 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (565,255+yup), (565,227-ydown), 1)
+			riga1 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (550,255+yup), (550,227-ydown), 1)
+			riga2 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (557,255+yup), (557,227-ydown), 1)
+			riga3 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (565,255+yup), (565,227-ydown), 1)
 			pygame.display.flip()
 	elif 384 <= x <= 414 and 560 < y < 570:
 			yup = 0
@@ -159,9 +159,9 @@ def drawroll(x,y):
 			for x in range(1,15):
 				yup += 1
 				ydown += 1
-				riga4 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (396,163+yup), (396,149-ydown), 1)
-				riga5 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (401,163+yup), (401,149-ydown), 1)
-				riga6 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (406,163+yup), (406,149-ydown), 1)
+				riga4 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (396,163+yup), (396,149-ydown), 1)
+				riga5 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (401,163+yup), (401,149-ydown), 1)
+				riga6 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (406,163+yup), (406,149-ydown), 1)
 				pygame.display.flip()
 
 def printcredit(credit):
@@ -570,12 +570,12 @@ while 1:
 		r_bar_body.position = 710, 74
 		l_bar_body.position = 502, 74
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
+		
+		drawroll(ballbody.position.x,ballbody.position.y)
+		printcredit(credit)
 
 		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
 		drawall()
-
-		drawroll(ballbody.position.x,ballbody.position.y)
-		printcredit(credit)
 
 		#Update Physics
 		dt = 1/50.0/3
