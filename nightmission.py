@@ -5,6 +5,7 @@ def newball():
 	ballbody = pm.Body(mass, moment)
 	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.5
+	ballbody.position = (890,300)
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
 	global ballbody
@@ -56,10 +57,14 @@ def punteggiodesign():
 		NUMERODUE= fontsuino.render(("2"),True,THECOLORS["white"])
 		NUMEROTRE= fontsuino.render(("3"),True,THECOLORS["white"])
 		NUMEROQUATTRO= fontsuino.render(("4"),True,THECOLORS["white"])
+		CREDIT = fontsuino.render(("Credits"),True,THECOLORS["white"])
+		BALLS = fontsuino.render(("Balls"),True,THECOLORS["white"])
 		window.blit(NUMEROUNO,(150,15))
 		window.blit(NUMERODUE,(150,125))
 		window.blit(NUMEROTRE,(150,235))
 		window.blit(NUMEROQUATTRO,(150,345))
+		window.blit(CREDIT,(10,605))
+		window.blit(BALLS,(190,605))
 def printscore(letters,scores):
 	printscore = fontsuino.render(("%s"%scores),True,THECOLORS["white"])
 	window.blit(printscore,(40,55))
@@ -139,7 +144,6 @@ def drawroll(x,y):
 	riga5 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (401,163), (401,149), 1)
 	riga6 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (406,163), (406,149), 1)
 	if 540 <= x <= 570 and 480 < y < 500:
-		print("suca")
 		yup = 0
 		ydown = 0
 		for x in range(1,15):
@@ -162,7 +166,30 @@ def drawroll(x,y):
 
 def printcredit(credit):
 	printcredit=fontsuino.render(("%s"%credit),True,THECOLORS["white"])
-	window.blit(printcredit,(1020,550))
+	window.blit(printcredit,(70,655))
+	printballs=fontsuino.render(("%s"%nball),True,THECOLORS["white"])
+	window.blit(printballs,(230,655))
+
+def setletters():
+	letters = {
+	"d": True,
+	"r": True,
+	"o": True,
+	"p": True,
+	"f": True,
+	"l": True,
+	"y": True,
+	"a": True,
+	"b": True,
+	"c": True,
+	"d2": True,
+	"n": True,
+	"i": True,
+	"g": True,
+	"h": True,
+	"t": True
+	}
+	return letters
 
 import pygame,sys,pymunk,score
 from pygame.locals import *
@@ -357,35 +384,20 @@ fontsmallest = pygame.font.Font('FONT/ARCADECLASSIC.TTF',25)
 #Event
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
-porco,ti = pygame.USEREVENT+2,500
-pygame.time.set_timer(porco, ti)
-chiave = False
+TILTS,t1 = pygame.USEREVENT+2,2000
+pygame.time.set_timer(MOVEEVENT, t)
+pygame.time.set_timer(TILTS, t1)
 
 #Game
 balls = []
 gates = []
-letters = {
-	"d": True,
-	"r": True,
-	"o": True,
-	"p": True,
-	"f": True,
-	"l": True,
-	"y": True,
-	"a": True,
-	"b": True,
-	"c": True,
-	"d2": True,
-	"n": True,
-	"i": True,
-	"g": True,
-	"h": True,
-	"t": True
-}
+letters = setletters()
 scores = 0
 credit = 0
 nball = 0
+tilt = 0
 start = True
+tilted = False
 while 1:
 	while start:
 		#Menu Start
@@ -403,7 +415,8 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_a: #Start
 				#Create the ball
 				balls.append(newball())
-
+				balls.remove(ballform)
+				space.remove(ballbody,ballform)
 				#Power of spring
 				springs = 584
 
@@ -430,16 +443,18 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_c:
 				if credit != 25:
 					credit+=1
+					sound = pygame.mixer.Sound("credit.ogg")
+					sound.play()
 			elif event.type == KEYDOWN and event.key == K_LSHIFT:
 				if credit != 0:
-					ballbody.position = Vec2d(890,300) 
-					springs = 584
-					credit -= 1
-					nball += 3
-					print(nball)
-			elif event.type == KEYDOWN and event.key == K_RIGHT:
+					if balls == []:
+						balls.append(newball())
+						credit -= 1
+						nball += 3
+						print(nball)
+			elif event.type == KEYDOWN and event.key == K_RIGHT and tilted == False:
 				r_bar_body.apply_impulse_at_local_point(Vec2d.unit() * 15000, (-100, 0))
-			elif event.type == KEYDOWN and event.key == K_LEFT:
+			elif event.type == KEYDOWN and event.key == K_LEFT and tilted == False:
 				l_bar_body.apply_impulse_at_local_point(Vec2d.unit() * -15000, (-100, 0))
 			elif event.type == KEYDOWN and event.key == K_DOWN:
 				if springs != 704:
@@ -447,22 +462,35 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_UP:
 				if springs != 584:
 					springs -= 30
+			elif event.type == KEYDOWN and event.key == K_z:
+				if balls != []:
+					tilt += 1
+					ballbody.apply_impulse_at_local_point((Vec2d((100,0))))
+			elif event.type == KEYDOWN and event.key == K_x:
+				if balls != []:
+					tilt += 1
+					ballbody.apply_impulse_at_local_point((Vec2d((-100,0))))
 			elif event.type == KEYDOWN and event.key == K_SPACE: #and 146 <= ballbody.position[1] <= 147 and ballbody.position[0] == 890.0:
 				power = speed(springs)
 				ballbody.apply_impulse_at_local_point((Vec2d((0,power))))
 				drawsprings()
 				springs = 584
-			elif event.type == porco and chiave == True:
-				print("evento")
-				pygame.draw.line(window,THECOLORS["white"],(550,230-up),(550,250+up),3)
-				pygame.draw.line(window,THECOLORS["white"],(557,230-up),(557,250+up),3)
-				pygame.draw.line(window,THECOLORS["white"],(564,230-up),(564,250+up),3)
-				up += 0.2
+			elif event.type == TILTS and tilt != 0:
+				tilt = 0
+
+		#Porco dio
+		if tilt >= 3:
+			tilted = True
+		if tilted == True:
+			tiltext = font.render(("TILT"),True,THECOLORS["white"])
+			window.blit(tiltext,(975,115))
 
 		#Animazione Molla Bonus
 		if 825 <= ballbody.position.x <= 875 and ballbody.position.y < 154:
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
+			sound = pygame.mixer.Sound("mollabonus.ogg")
+			sound.play()
 
 			go = True
 			while go:
@@ -473,7 +501,7 @@ while 1:
 				printscore(letters,scores)
 				drawall()
 				draw()
-				drawroll()
+				drawroll(ballbody.position.x,ballbody.position.y)
 				drawsprings()
 				space.debug_draw(OptionsDraw)
 				pygame.display.update()
@@ -496,6 +524,8 @@ while 1:
 
 		#*** MOLLA AEROPORTO DI BIRGI****
 		if 500 <= ballbody.position.x <= 550 and 450 < ballbody.position.y < 500:
+			sound = pygame.mixer.Sound("birgi.ogg")
+			sound.play()
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
 			mass = 1.5
@@ -519,13 +549,15 @@ while 1:
 
 		#Respawn Ball
 		if ballbody.position.y <= 12 and 333 <= ballbody.position.x <= 830:
+			tilted = False
+			tilt = 0
 			gates = deletegate(gates)
 			balls.remove(ballform)
 			space.remove(ballbody,ballform)
+			letters = setletters()
 			if nball != 0:
 				#Create new ball
 				balls.append(newball())
-				ballbody.position = Vec2d(890,260)
 				nball -= 1
 				print(nball)
 			else:
