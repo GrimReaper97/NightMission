@@ -3,7 +3,6 @@ def newball():
 	radius = 10.3
 	moment = pm.moment_for_circle(mass, radius, 0.0, (0,0))
 	ballbody = pm.Body(mass, moment)
-	ballbody.position = Vec2d(890,300) 
 	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.5
 	ballform.color = THECOLORS["white"]
@@ -11,6 +10,18 @@ def newball():
 	global ballbody
 	global ballform
 	return ballform
+
+def newgate():
+	gate = pymunk.Segment(space.static_body, (870,560), (900,612), 1)
+	gate.elasticity = 2.5
+	gate.color = pygame.color.THECOLORS["white"]
+	space.add(gate)
+	return gate
+def deletegate(gates):
+	for pinna in gates:
+		space.remove(pinna)
+	gates = []
+	return gates
 
 def changey(position):
 	return int(position.x), int(-position.y+720)
@@ -118,7 +129,42 @@ def drawall():
 	printletters()
 	draw()
 
-import random,pygame,sys,pymunk,score
+def drawroll(x,y): 
+	riga1 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (550,255), (550,227), 1)
+	riga2 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (557,255), (557,227), 1)
+	riga3 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (565,255), (565,227), 1)
+	pygame.draw.line(window, pygame.color.THECOLORS["red"], (542,242), (572,242), 1)
+	pygame.draw.line(window, pygame.color.THECOLORS["red"], (384,155), (418,155), 1)
+	riga4 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (396,163), (396,149), 1)
+	riga5 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (401,163), (401,149), 1)
+	riga6 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (406,163), (406,149), 1)
+	if 540 <= x <= 570 and 480 < y < 500:
+		print("suca")
+		yup = 0
+		ydown = 0
+		for x in range(1,15):
+			yup += 1.5
+			ydown += 1.5
+			riga1 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (550,255+yup), (550,227-ydown), 1)
+			riga2 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (557,255+yup), (557,227-ydown), 1)
+			riga3 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (565,255+yup), (565,227-ydown), 1)
+			pygame.display.flip()
+	elif 384 <= x <= 414 and 560 < y < 570:
+			yup = 0
+			ydown = 0
+			for x in range(1,15):
+				yup += 1
+				ydown += 1
+				riga4 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (396,163+yup), (396,149-ydown), 1)
+				riga5 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (401,163+yup), (401,149-ydown), 1)
+				riga6 = pygame.draw.line(window, pygame.color.THECOLORS["red"], (406,163+yup), (406,149-ydown), 1)
+				pygame.display.flip()
+
+def printcredit(credit):
+	printcredit=fontsuino.render(("%s"%credit),True,THECOLORS["white"])
+	window.blit(printcredit,(1020,550))
+
+import pygame,sys,pymunk,score
 from pygame.locals import *
 from pygame.color import *
 import pymunk as pm
@@ -249,18 +295,18 @@ for q in [(630,500),(550,350)]:
 	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 	body.position = q
 	shape = pymunk.Circle(body, 9)
-	shape.elasticity = 3
+	shape.elasticity = 2
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
 
 bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-bumperleft.elasticity = 2
+bumperleft.elasticity = 2.5
 bumperleft.group = 1
 bumperleft.friction = 1
 bumperleft.color = pygame.color.THECOLORS["white"]
 bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-bumperight.elasticity = 2
+bumperight.elasticity = 2.5
 bumperight.group = 1
 bumperight.friction = 1
 bumperight.color = pygame.color.THECOLORS["white"]
@@ -286,7 +332,7 @@ union = pymunk.PinJoint(r_bar_body, r_bar_union_body, (0,0), (0,0))
 rotary = pymunk.DampedRotarySpring(r_bar_body, r_bar_union_body, 0.35, 9000000,999999)
 space.add(union, rotary)
 
-#Flipper Right
+#Flipper Left
 l_bar_body = pymunk.Body(mass, mo)
 l_bar_body.position = 502, 74
 l_bar_form = pymunk.Poly(l_bar_body, lbar)
@@ -311,11 +357,13 @@ fontsmallest = pygame.font.Font('FONT/ARCADECLASSIC.TTF',25)
 #Event
 MOVEEVENT,t = pygame.USEREVENT+1,3000
 pygame.time.set_timer(MOVEEVENT, t)
-porco,ti = pygame.USEREVENT+1,500
+porco,ti = pygame.USEREVENT+2,500
 pygame.time.set_timer(porco, ti)
 chiave = False
+
 #Game
 balls = []
+gates = []
 letters = {
 	"d": True,
 	"r": True,
@@ -335,6 +383,8 @@ letters = {
 	"t": True
 }
 scores = 0
+credit = 0
+nball = 0
 start = True
 while 1:
 	while start:
@@ -353,6 +403,7 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_a: #Start
 				#Create the ball
 				balls.append(newball())
+
 				#Power of spring
 				springs = 584
 
@@ -376,6 +427,16 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_ESCAPE:
 				pause = True
 				running = False
+			elif event.type == KEYDOWN and event.key == K_c:
+				if credit != 25:
+					credit+=1
+			elif event.type == KEYDOWN and event.key == K_LSHIFT:
+				if credit != 0:
+					ballbody.position = Vec2d(890,300) 
+					springs = 584
+					credit -= 1
+					nball += 3
+					print(nball)
 			elif event.type == KEYDOWN and event.key == K_RIGHT:
 				r_bar_body.apply_impulse_at_local_point(Vec2d.unit() * 15000, (-100, 0))
 			elif event.type == KEYDOWN and event.key == K_LEFT:
@@ -403,14 +464,19 @@ while 1:
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
 
-			pygame.draw.circle(window, THECOLORS["white"], (852,566), 10, 0)
-			drawall()
-			draw()
-			drawsprings()
-			space.debug_draw(OptionsDraw)
-			pygame.display.update()
 			go = True
 			while go:
+				sfondo = pygame.image.load("prova1.jpg")
+				window.blit(sfondo,(0,0))
+				pygame.draw.circle(window, THECOLORS["white"], (852,566), 10, 0)
+				scores += 2
+				printscore(letters,scores)
+				drawall()
+				draw()
+				drawroll()
+				drawsprings()
+				space.debug_draw(OptionsDraw)
+				pygame.display.update()
 				for event in pygame.event.get():
 					if event.type == MOVEEVENT:
 						mass = 1
@@ -447,6 +513,25 @@ while 1:
 		#Springs
 		pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,springs), 30)
 
+		#Gate
+		if ballbody.position.y > 598 and 860 <= ballbody.position.x <= 890: ## modificare condizione
+			gates.append(newgate())
+
+		#Respawn Ball
+		if ballbody.position.y <= 12 and 333 <= ballbody.position.x <= 830:
+			gates = deletegate(gates)
+			balls.remove(ballform)
+			space.remove(ballbody,ballform)
+			if nball != 0:
+				#Create new ball
+				balls.append(newball())
+				ballbody.position = Vec2d(890,260)
+				nball -= 1
+				print(nball)
+			else:
+				print(nball)
+				pass
+
 		#Draw Stuff
 		space.debug_draw(OptionsDraw)
 
@@ -454,16 +539,11 @@ while 1:
 		l_bar_body.position = 502, 74
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
 
-		#Respawn Ball
-		if ballbody.position.y <= 12 and 333 <= ballbody.position.x <= 830:
-			balls.remove(ballform)
-			space.remove(ballbody,ballform)
-
-			#Create new ball
-			balls.append(newball())
-
 		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
 		drawall()
+
+		drawroll(ballbody.position.x,ballbody.position.y)
+		printcredit(credit)
 
 		#Update Physics
 		dt = 1/50.0/3
@@ -471,7 +551,7 @@ while 1:
 			space.step(dt)
 
 		#Flip Screen
-		time.tick(30)
+		time.tick()
 		pygame.display.flip()
 	while pause:
 		window.fill(THECOLORS["black"])
@@ -489,6 +569,7 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_r: #Restart
 				space.remove(ballbody, ballform)
 				balls.remove(ballform)
+				gates = deletegate(gates)
 				running = False
 				pause = False
 				start = True
