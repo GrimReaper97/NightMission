@@ -1,10 +1,10 @@
 def newball():
-	mass = 1.5
+	mass = 1
 	radius = 10.3
 	moment = pm.moment_for_circle(mass, radius, 0.0, (0,0))
 	ballbody = pm.Body(mass, moment)
 	ballform = pm.Circle(ballbody, radius, (0,0))
-	ballform.elasticity = 0.5
+	ballform.elasticity = 0.3
 	ballbody.position = (890,300)
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
@@ -14,7 +14,7 @@ def newball():
 
 def newgate():
 	gate = pymunk.Segment(space.static_body, (870,560), (900,612), 1)
-	gate.elasticity = 2.5
+	gate.elasticity = 0.7
 	gate.color = pygame.color.THECOLORS["white"]
 	space.add(gate)
 	return gate
@@ -328,12 +328,12 @@ for q in [(630,500),(550,350)]:
 	bumpers.append(shape)
 
 bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-bumperleft.elasticity = 2.5
+bumperleft.elasticity = 1.5
 bumperleft.group = 1
 bumperleft.friction = 1
 bumperleft.color = pygame.color.THECOLORS["white"]
 bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-bumperight.elasticity = 2.5
+bumperight.elasticity = 1.5
 bumperight.group = 1
 bumperight.friction = 1
 bumperight.color = pygame.color.THECOLORS["white"]
@@ -417,6 +417,7 @@ while 1:
 				balls.append(newball())
 				balls.remove(ballform)
 				space.remove(ballbody,ballform)
+
 				#Power of spring
 				springs = 584
 
@@ -551,9 +552,11 @@ while 1:
 		if ballbody.position.y <= 12 and 333 <= ballbody.position.x <= 830:
 			tilted = False
 			tilt = 0
-			gates = deletegate(gates)
-			balls.remove(ballform)
-			space.remove(ballbody,ballform)
+			if balls != []:
+				space.remove(ballbody, ballform)
+				balls.remove(ballform)
+			if gates != []:
+				gates = deletegate(gates)
 			letters = setletters()
 			if nball != 0:
 				#Create new ball
@@ -599,9 +602,13 @@ while 1:
 				pygame.quit()
 				sys.exit()
 			elif event.type == KEYDOWN and event.key == K_r: #Restart
-				space.remove(ballbody, ballform)
-				balls.remove(ballform)
-				gates = deletegate(gates)
+				if balls != []:
+					space.remove(ballbody, ballform)
+					balls.remove(ballform)
+				if gates != []:
+					gates = deletegate(gates)
+				nball = 0
+				credit = 0
 				running = False
 				pause = False
 				start = True
