@@ -4,7 +4,7 @@ def newball():
 	moment = pm.moment_for_circle(mass, radius, 0.0, (0,0))
 	ballbody = pm.Body(mass, moment)
 	ballform = pm.Circle(ballbody, radius, (0,0))
-	ballform.elasticity = 0.3
+	ballform.elasticity = 0.7
 	ballbody.position = (890,300)
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
@@ -134,36 +134,6 @@ def drawall():
 	printletters()
 	draw()
 
-def drawroll(x,y): 
-	riga1 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (550,255), (550,227), 1)
-	riga2 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (557,255), (557,227), 1)
-	riga3 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (565,255), (565,227), 1)
-	pygame.draw.line(window, pygame.color.THECOLORS["white"], (542,242), (572,242), 1)
-	pygame.draw.line(window, pygame.color.THECOLORS["white"], (384,155), (418,155), 1)
-	riga4 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (396,163), (396,149), 1)
-	riga5 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (401,163), (401,149), 1)
-	riga6 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (406,163), (406,149), 1)
-	if 540 <= x <= 570 and 480 < y < 500:
-		yup = 0
-		ydown = 0
-		for x in range(1,15):
-			yup += 1.5
-			ydown += 1.5
-			riga1 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (550,255+yup), (550,227-ydown), 1)
-			riga2 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (557,255+yup), (557,227-ydown), 1)
-			riga3 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (565,255+yup), (565,227-ydown), 1)
-			pygame.display.flip()
-	elif 384 <= x <= 414 and 560 < y < 570:
-			yup = 0
-			ydown = 0
-			for x in range(1,15):
-				yup += 1
-				ydown += 1
-				riga4 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (396,163+yup), (396,149-ydown), 1)
-				riga5 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (401,163+yup), (401,149-ydown), 1)
-				riga6 = pygame.draw.line(window, pygame.color.THECOLORS["white"], (406,163+yup), (406,149-ydown), 1)
-				pygame.display.flip()
-
 def printcredit(credit):
 	printcredit=fontsuino.render(("%s"%credit),True,THECOLORS["white"])
 	window.blit(printcredit,(70,655))
@@ -202,7 +172,7 @@ pygame.init()
 window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Night Mission")
 time = pygame.time.Clock()
-
+dio = True
 #Physics Stuff
 space = pm.Space()
 space.gravity = (0.0, -180.0)
@@ -328,12 +298,12 @@ for q in [(630,500),(550,350)]:
 	bumpers.append(shape)
 
 bumperleft = pymunk.Segment(space.static_body, (438,257), (498,123), 1)
-bumperleft.elasticity = 1.5
+bumperleft.elasticity = 2
 bumperleft.group = 1
 bumperleft.friction = 1
 bumperleft.color = pygame.color.THECOLORS["white"]
 bumperight = pymunk.Segment(space.static_body, (768,264), (709,133), 1)
-bumperight.elasticity = 1.5
+bumperight.elasticity = 2
 bumperight.group = 1
 bumperight.friction = 1
 bumperight.color = pygame.color.THECOLORS["white"]
@@ -396,8 +366,10 @@ scores = 0
 credit = 0
 nball = 0
 tilt = 0
+animazione = 1
 start = True
 tilted = False
+
 while 1:
 	while start:
 		#Menu Start
@@ -479,7 +451,7 @@ while 1:
 			elif event.type == TILTS and tilt != 0:
 				tilt = 0
 
-		#Porco dio
+		#Tilt animation
 		if tilt >= 3:
 			tilted = True
 		if tilted == True:
@@ -502,14 +474,13 @@ while 1:
 				printscore(letters,scores)
 				drawall()
 				draw()
-				drawroll(ballbody.position.x,ballbody.position.y)
 				drawsprings()
 				space.debug_draw(OptionsDraw)
 				pygame.display.update()
 				for event in pygame.event.get():
 					if event.type == MOVEEVENT:
 						mass = 1
-						radius = 10
+						radius = 10.3
 						inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
 						ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
 
@@ -529,7 +500,7 @@ while 1:
 			sound.play()
 			space.remove(ballbody, ballform)
 			balls.remove(ballform)
-			mass = 1.5
+			mass = 1
 			radius = 10.3
 			inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
 			ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
@@ -539,7 +510,7 @@ while 1:
 			ballbody.position = 510, 480
 			space.add(ballbody, ballform)
 			balls.append(ballform)
-			ballbody.apply_impulse_at_local_point((Vec2d((0,800))))
+			ballbody.apply_impulse_at_local_point((Vec2d((0,1200))))
 
 		#Springs
 		pygame.draw.line(window, pygame.color.THECOLORS["white"], (890,707), (890,springs), 30)
@@ -565,7 +536,6 @@ while 1:
 				print(nball)
 			else:
 				print(nball)
-				pass
 
 		#Draw Stuff
 		space.debug_draw(OptionsDraw)
@@ -573,16 +543,42 @@ while 1:
 		r_bar_body.position = 710, 74
 		l_bar_body.position = 502, 74
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
-		
-		drawroll(ballbody.position.x,ballbody.position.y)
+
+		#Animation rollover
+		rollo = pygame.draw.rect(window, THECOLORS["white"], (548,235,19,7))
+		if 540 <= ballbody.position.x <= 570 and 480 < ballbody.position.y < 500:
+			if animazione == 1:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,230,19,18))
+			if animazione == 2:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,11))
+			if animazione == 3:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,235,19,7))
+			if animazione == 4:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,235,19,7))
+			if animazione == 5:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,235,19,11))
+			if animazione == 6:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+			if animazione == 7:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+			if animazione == 8:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+			if animazione == 9:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+			if animazione == 10:
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+				animazione = 1
+			else:
+				animazione += 1
+
 		printcredit(credit)
 
 		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
 		drawall()
 
 		#Update Physics
-		dt = 1/50.0/3
-		for x in range(9):
+		dt = 1/60.0/6
+		for x in range(12):
 			space.step(dt)
 
 		#Flip Screen
@@ -608,6 +604,7 @@ while 1:
 				if gates != []:
 					gates = deletegate(gates)
 				nball = 0
+				tilt = 0
 				credit = 0
 				running = False
 				pause = False
