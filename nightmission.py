@@ -90,6 +90,10 @@ def printletters():
 	lettera_C = fontsmallest.render(("C"),True,THECOLORS["white"])
 	lettera_D2 = fontsmallest.render(("D"),True,THECOLORS["white"])
 
+	lettera_F = fontsmall.render(("F"),True,THECOLORS["white"])
+	lettera_L = fontsmall.render(("L"),True,THECOLORS["white"])
+	lettera_Y = fontsmall.render(("Y"),True,THECOLORS["white"])
+
 	if letters["n"] == True:
 		window.blit(lettera_N,(620,140))
 	if letters["i"] == True:
@@ -116,6 +120,15 @@ def printletters():
 		window.blit(lettera_C,(828,233))
 	if letters["d2"] == True:		
 		window.blit(lettera_D2,(802,265))
+	if letters["f"] == True:
+		window.blit(lettera_F,(461,327))
+		pygame.draw.line(window, pygame.color.THECOLORS["blue"], (448,333), (475,323), 3)
+	if letters["l"] == True:
+		window.blit(lettera_L,(495,314))
+		pygame.draw.line(window, pygame.color.THECOLORS["blue"], (483,319), (508,309.5), 3)
+	if letters["y"] == True:
+		window.blit(lettera_Y,(524,301))
+		pygame.draw.line(window, pygame.color.THECOLORS["blue"], (515,305), (541,295), 3)
 
 def speed(springs):
 	if springs == 584:

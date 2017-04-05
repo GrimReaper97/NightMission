@@ -46,6 +46,17 @@ def countscore(x,y,letters,scores,scorebonus,special):
 	elif 801 <= x <= 829 and 419 <= y <= 445 and letters["d2"] == True:#D
 		scores += 1000
 		letters["d2"] = False
+
+	elif 438 <= x <= 478 and 384 <= y <= 405 and letters["f"] == True:#F
+		scores += 1000 + scorebonus
+		letters["f"] = False
+	elif 475 <= x <= 514 and 401 <= y <= 418 and letters["l"] == True:#L
+		scores += 1000
+		letters["l"] = False
+	elif 508 <= x <= 544 and 409 <= y <= 433 and letters["y"] == True:#Y
+		scores += 1000
+		letters["y"] = False
+
 	elif 825 <= x <= 860 and 295 <= y <= 300:#PERCORSO MOLLA BONUS
 		scores += 100
 	elif 785 <= x <= 820 and 220 <= y <= 225:#PERCORSO FLIPPER DESTRO
