@@ -5,6 +5,8 @@ def newball():
 	ballbody = pm.Body(mass, moment)
 	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.7
+	ballform.group = 1
+	ballform.collision_type = collisions["ball"]
 	ballbody.position = (890,300)
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
@@ -26,6 +28,8 @@ def deletegate(gates):
 
 def changey(position):
 	return int(position.x), int(-position.y+720)
+def flipy(y): ##
+	return -y+720 ##
 
 def draw():
 	for ball in balls:
@@ -109,9 +113,9 @@ def printletters():
 	if letters["b"] == True:
 		window.blit(lettera_B,(818,347))
 	if letters["c"] == True:
-		window.blit(lettera_C,(492,38))
+		window.blit(lettera_C,(828,233))
 	if letters["d2"] == True:		
-		window.blit(lettera_D2,(517,44))
+		window.blit(lettera_D2,(802,265))
 
 def speed(springs):
 	if springs == 584:
@@ -157,9 +161,37 @@ def setletters():
 	"i": True,
 	"g": True,
 	"h": True,
-	"t": True
+	"t": True,
+	"bonusabcd" : True,
+	"bonusnight" : True,
+	"bonusfly" : True,
+	"special" : True,
+	"multiball": True
 	}
 	return letters
+
+def bumpersmall(arbiter, space, data):
+	ballform.group = 2
+def bumperbig(arbiter, space, data):
+	ballform.group = 3
+
+def multiball():
+	mass = 1
+	radius = 10.3
+	inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
+	ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
+
+	ballform = pymunk.Circle(ballbody, radius, (0,0))
+	ballform.elasticity = 0.7
+	ballform.group = 1
+	ballform.color = pygame.color.THECOLORS["white"]
+	ballform.collision_type = collisions["ball"]
+	ballbody.position = 852, 154
+	space.add(ballbody, ballform)
+	balls.append(ballform)
+	global ballbody
+	global ballform
+	ballbody.apply_impulse_at_local_point((Vec2d((0,500))))
 
 import pygame,sys,pymunk,score
 from pygame.locals import *
@@ -172,7 +204,13 @@ pygame.init()
 window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Night Mission")
 time = pygame.time.Clock()
-dio = True
+
+collisions = {
+	"ball": 1,
+	"bumpers": 2,
+	"bumperb": 3
+}
+
 #Physics Stuff
 space = pm.Space()
 space.gravity = (0.0, -180.0)
@@ -284,6 +322,7 @@ for p in [(790,500), (650,320),(700,450)]:
 	body.position = p
 	shape = pymunk.Circle(body, 14)
 	shape.elasticity = 3
+	shape.collision_type = collisions["bumperb"]
 	shape.friction = 1
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
@@ -293,6 +332,7 @@ for q in [(630,500),(550,350)]:
 	body.position = q
 	shape = pymunk.Circle(body, 9)
 	shape.elasticity = 2
+	shape.collision_type = collisions["bumpers"]
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
@@ -363,13 +403,17 @@ balls = []
 gates = []
 letters = setletters()
 scores = 0
+scorebonus = 0
 credit = 0
 nball = 0
 tilt = 0
 animazione = 1
+animazionep = 1
+special = True
+suca = True
 start = True
 tilted = False
-
+global scores
 while 1:
 	while start:
 		#Menu Start
@@ -424,7 +468,6 @@ while 1:
 						balls.append(newball())
 						credit -= 1
 						nball += 3
-						print(nball)
 			elif event.type == KEYDOWN and event.key == K_RIGHT and tilted == False:
 				r_bar_body.apply_impulse_at_local_point(Vec2d.unit() * 15000, (-100, 0))
 			elif event.type == KEYDOWN and event.key == K_LEFT and tilted == False:
@@ -450,6 +493,20 @@ while 1:
 				springs = 584
 			elif event.type == TILTS and tilt != 0:
 				tilt = 0
+			elif event.type == MOUSEBUTTONUP:
+				puntisuca = Vec2d(event.pos[0], flipy(event.pos[1]))
+				mass = 1
+				radius = 10.3
+				moment = pm.moment_for_circle(mass, radius, 0.0, (0,0))
+				ballbody = pm.Body(mass, moment)
+				ballform = pm.Circle(ballbody, radius, (0,0))
+				ballform.elasticity = 0.7
+				ballform.group = 1
+				ballform.collision_type = collisions["ball"]
+				ballbody.position = puntisuca
+				ballform.color = THECOLORS["white"]
+				space.add(ballbody, ballform)
+				balls.append(ballform)
 
 		#Tilt animation
 		if tilt >= 3:
@@ -460,7 +517,7 @@ while 1:
 
 		#Animazione Molla Bonus
 		if 825 <= ballbody.position.x <= 875 and ballbody.position.y < 154:
-			space.remove(ballbody, ballform)
+			space.remove(ballform,ballbody)
 			balls.remove(ballform)
 			sound = pygame.mixer.Sound("mollabonus.ogg")
 			sound.play()
@@ -479,19 +536,7 @@ while 1:
 				pygame.display.update()
 				for event in pygame.event.get():
 					if event.type == MOVEEVENT:
-						mass = 1
-						radius = 10.3
-						inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
-						ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
-
-						ballform = pymunk.Circle(ballbody, radius, (0,0))
-						ballform.elasticity = 0.7
-						ballform.color = pygame.color.THECOLORS["white"]
-						ballbody.position = 852, 154
-						space.add(ballbody, ballform)
-						balls.append(ballform)
-
-						ballbody.apply_impulse_at_local_point((Vec2d((0,500))))
+						multiball()
 						go = False
 
 		#*** MOLLA AEROPORTO DI BIRGI****
@@ -506,7 +551,9 @@ while 1:
 			ballbody = pymunk.Body(mass, inertia,body_type=pymunk.Body.DYNAMIC)
 			ballform = pymunk.Circle(ballbody, radius, (0,0))
 			ballform.elasticity = 0.7
+			ballform.group = 1
 			ballform.color = pygame.color.THECOLORS["white"]
+			ballform.collision_type = collisions["ball"]
 			ballbody.position = 510, 480
 			space.add(ballbody, ballform)
 			balls.append(ballform)
@@ -529,13 +576,10 @@ while 1:
 			if gates != []:
 				gates = deletegate(gates)
 			letters = setletters()
-			if nball != 0:
+			if balls == []:
 				#Create new ball
 				balls.append(newball())
 				nball -= 1
-				print(nball)
-			else:
-				print(nball)
 
 		#Draw Stuff
 		space.debug_draw(OptionsDraw)
@@ -558,22 +602,72 @@ while 1:
 			if animazione == 5:
 				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,235,19,11))
 			if animazione == 6:
-				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,7))
 			if animazione == 7:
 				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
 			if animazione == 8:
-				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,7))
 			if animazione == 9:
-				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
+				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,11))
 			if animazione == 10:
 				rollo = pygame.draw.rect(window, THECOLORS["white"], (548,233,19,18))
 				animazione = 1
 			else:
 				animazione += 1
-
+		#ROLLOVER PICCOLO
+		rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,7))
+		if 390 <= ballbody.position.x <= 420 and 540 < ballbody.position.y < 560:
+			if animazionep == 1:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,18))
+			if animazionep == 2:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,11))
+			if animazionep == 3:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,7))
+			if animazionep == 4:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,7))
+			if animazionep == 5:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,11))
+			if animazionep == 6:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,18))
+			if animazionep == 7:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,18))
+			if animazionep == 8:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,18))
+			if animazionep == 9:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,18))
+			if animazionep == 10:
+				rollop = pygame.draw.rect(window, THECOLORS["white"], (392,170,19,18))
+				animazionep = 1
+			else:
+				animazionep += 1
 		printcredit(credit)
 
-		scores = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores)
+		##Punteggio for bumper
+		h = space.add_collision_handler(
+			collisions["ball"], 
+			collisions["bumpers"])
+		h.post_solve = bumpersmall
+		p = space.add_collision_handler(
+			collisions["ball"], 
+			collisions["bumperb"])
+		p.post_solve = bumperbig
+		if ballform.group == 2:
+			scores += 50
+			ballform.group = 1
+		elif ballform.group == 3:
+			scores += 90
+			ballform.group = 1
+
+		#Multiball
+		if letters["multiball"] == False:
+			multiball()
+			letters["multiball"] = None
+		if scorebonus >= 3000: #Special
+			if suca == True:
+				multiball()
+				suca = False
+
+		scores,scorebonus = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores,scorebonus,special)
 		drawall()
 
 		#Update Physics
