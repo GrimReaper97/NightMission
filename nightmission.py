@@ -87,11 +87,11 @@ def printletters():
 
 	lettera_A = fontsmall.render(("A"),True,THECOLORS["white"])
 	lettera_B = fontsmall.render(("B"),True,THECOLORS["white"])
-	lettera_C = fontsmallest.render(("C"),True,THECOLORS["white"])
-	lettera_D2 = fontsmallest.render(("D"),True,THECOLORS["white"])
+	lettera_C = fontsmall.render(("C"),True,THECOLORS["white"])
+	lettera_D2 = fontsmall.render(("D"),True,THECOLORS["white"])
 
-	lettera_F = fontsmall.render(("F"),True,THECOLORS["white"])
-	lettera_L = fontsmall.render(("L"),True,THECOLORS["white"])
+	lettera_F = fontsmallest.render(("F"),True,THECOLORS["white"])
+	lettera_L = fontsmallest.render(("L"),True,THECOLORS["white"])
 	lettera_Y = fontsmall.render(("Y"),True,THECOLORS["white"])
 
 	if letters["n"] == True:
@@ -114,21 +114,25 @@ def printletters():
 		window.blit(lettera_P,(417,460))
 	if letters["a"] == True:
 		window.blit(lettera_A,(795,325))
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (804,323), (827,342), 3)
 	if letters["b"] == True:
 		window.blit(lettera_B,(818,347))
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (852,361), (831,344), 3)
 	if letters["c"] == True:
 		window.blit(lettera_C,(828,233))
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (833,274), (857,244), 3)
 	if letters["d2"] == True:		
 		window.blit(lettera_D2,(802,265))
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (807,303), (829,277), 3)
 	if letters["f"] == True:
 		window.blit(lettera_F,(461,327))
-		pygame.draw.line(window, pygame.color.THECOLORS["blue"], (448,333), (475,323), 3)
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (448,333), (475,323), 3)
 	if letters["l"] == True:
 		window.blit(lettera_L,(495,314))
-		pygame.draw.line(window, pygame.color.THECOLORS["blue"], (483,319), (508,309.5), 3)
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (483,319), (508,309.5), 3)
 	if letters["y"] == True:
 		window.blit(lettera_Y,(524,301))
-		pygame.draw.line(window, pygame.color.THECOLORS["blue"], (515,305), (541,295), 3)
+		pygame.draw.line(window, pygame.color.THECOLORS["white"], (515,305), (541,295), 3)
 
 def speed(springs):
 	if springs == 584:
@@ -179,7 +183,8 @@ def setletters():
 	"bonusnight" : True,
 	"bonusfly" : True,
 	"special" : True,
-	"multiball": True
+	"multiball": True,
+	"bonusbumper": True
 	}
 	return letters
 
@@ -217,17 +222,15 @@ pygame.init()
 window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Night Mission")
 time = pygame.time.Clock()
+space = pm.Space()
+space.gravity = (0.0, -180.0)
+OptionsDraw = pymunk.pygame_util.DrawOptions(window)
 
 collisions = {
 	"ball": 1,
 	"bumpers": 2,
 	"bumperb": 3
 }
-
-#Physics Stuff
-space = pm.Space()
-space.gravity = (0.0, -180.0)
-OptionsDraw = pymunk.pygame_util.DrawOptions(window)
 
 staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (873, 136), (873, 560), 1.0)
@@ -328,11 +331,11 @@ for wall in staticwalls:
 	wall.color = pygame.color.THECOLORS["white"]
 space.add(staticwalls)
 
-##Bumpers
+#Bumpers
 bumpers = []
-for p in [(790,500), (650,320),(700,450)]:
+for b in [(790,500), (650,320),(700,450)]:
 	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-	body.position = p
+	body.position = b
 	shape = pymunk.Circle(body, 14)
 	shape.elasticity = 3
 	shape.collision_type = collisions["bumperb"]
@@ -340,9 +343,9 @@ for p in [(790,500), (650,320),(700,450)]:
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
-for q in [(630,500),(550,350)]:
+for s in [(630,500),(550,350)]:
 	body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-	body.position = q
+	body.position = s
 	shape = pymunk.Circle(body, 9)
 	shape.elasticity = 2
 	shape.collision_type = collisions["bumpers"]
@@ -369,26 +372,22 @@ lbar = [(-27,-16), (90, 0), (-15,10)]
 mass = 100
 mo = pymunk.moment_for_poly(mass, rbar)
 
-#Flipper Right
 r_bar_body = pymunk.Body(mass, mo)
 r_bar_body.position = 710, 74
 r_bar_form = pymunk.Poly(r_bar_body, rbar)
 r_bar_form.color = pygame.color.THECOLORS["white"]
 space.add(r_bar_body, r_bar_form)
-
 r_bar_union_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 r_bar_union_body.position = r_bar_body.position 
 union = pymunk.PinJoint(r_bar_body, r_bar_union_body, (0,0), (0,0))
 rotary = pymunk.DampedRotarySpring(r_bar_body, r_bar_union_body, 0.35, 9000000,999999)
 space.add(union, rotary)
 
-#Flipper Left
 l_bar_body = pymunk.Body(mass, mo)
 l_bar_body.position = 502, 74
 l_bar_form = pymunk.Poly(l_bar_body, lbar)
 l_bar_form.color = pygame.color.THECOLORS["white"]
 space.add(l_bar_body, l_bar_form)
-
 l_bar_union_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
 l_bar_union_body.position = l_bar_body.position 
 union = pymunk.PinJoint(l_bar_body, l_bar_union_body, (0,0), (0,0))
@@ -417,6 +416,7 @@ gates = []
 letters = setletters()
 scores = 0
 scorebonus = 0
+bumperbonus = 0
 credit = 0
 nball = 0
 tilt = 0
@@ -506,7 +506,7 @@ while 1:
 				springs = 584
 			elif event.type == TILTS and tilt != 0:
 				tilt = 0
-			elif event.type == MOUSEBUTTONUP:
+			elif event.type == MOUSEBUTTONUP: ##
 				puntisuca = Vec2d(event.pos[0], flipy(event.pos[1]))
 				mass = 1
 				radius = 10.3
@@ -518,6 +518,7 @@ while 1:
 				ballform.collision_type = collisions["ball"]
 				ballbody.position = puntisuca
 				ballform.color = THECOLORS["white"]
+				global ballform,ballbody
 				space.add(ballbody, ballform)
 				balls.append(ballform)
 
@@ -527,6 +528,8 @@ while 1:
 		if tilted == True:
 			tiltext = font.render(("TILT"),True,THECOLORS["white"])
 			window.blit(tiltext,(975,115))
+			setletters()
+			special = True
 
 		#Animazione Molla Bonus
 		if 825 <= ballbody.position.x <= 875 and ballbody.position.y < 154:
@@ -590,13 +593,14 @@ while 1:
 				gates = deletegate(gates)
 			letters = setletters()
 			if balls == []:
-				#Create new ball
-				balls.append(newball())
-				nball -= 1
+				if nball != 0:
+					#Create new ball
+					balls.append(newball())
+					nball -= 1
 
-		#Draw Stuff
 		space.debug_draw(OptionsDraw)
-
+		pygame.draw.circle(window,THECOLORS["white"],(710,646),6,0)
+		pygame.draw.circle(window,THECOLORS["white"],(502,646),6,0)
 		r_bar_body.position = 710, 74
 		l_bar_body.position = 502, 74
 		r_bar_body.velocity = l_bar_body.velocity = 0,0
@@ -665,11 +669,14 @@ while 1:
 			collisions["bumperb"])
 		p.post_solve = bumperbig
 		if ballform.group == 2:
-			scores += 50
+			scores += 50 + bumperbonus
 			ballform.group = 1
 		elif ballform.group == 3:
-			scores += 90
+			scores += 90 + bumperbonus
 			ballform.group = 1
+		if letters["bonusbumper"] == False:
+			bumperbonus = 150
+
 
 		#Multiball
 		if letters["multiball"] == False:

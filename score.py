@@ -66,9 +66,15 @@ def countscore(x,y,letters,scores,scorebonus,special):
 	elif 380 <= x <= 410 and 405 <= y <= 410:#SCIVOLO 5000
 		scores += 5000
 	elif 540 <= x <= 570 and 480 < y < 490: #ROLLOVER GRANDE
-		scores += 100
+		if special == False:
+			scores += 200
+		else:
+			scores += 100
 	elif 390 <= x <= 420 and 555 < y < 565:#ROLLOVER PICCOLO
-		scores += 200
+		if special == False:
+			scores += 400
+		else:
+			scores += 200
 
 
 #BONUSES
@@ -85,7 +91,7 @@ def countscore(x,y,letters,scores,scorebonus,special):
 		scores+=5000
 		letters["bonusfly"] = False
 	if letters["bonusabcd"] == False and letters["bonusfly"] == False:#SEQ ABCD+FLY
-		pass
+		bonusbumper = False
 	if letters["bonusabcd"] == False and letters["bonusnight"] == False and letters["multiball"] == True:#SEQ ABCD+NIGHT 
 		letters["multiball"] = False
 	if special == False:
