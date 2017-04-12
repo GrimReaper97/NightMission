@@ -6,12 +6,11 @@ def newball():
 	ballform = pm.Circle(ballbody, radius, (0,0))
 	ballform.elasticity = 0.7
 	ballform.group = 1
-	ballform.collision_type = collisions["ball"]
+	ballform.collision_type = 1
 	ballbody.position = (890,300)
 	ballform.color = THECOLORS["white"]
 	space.add(ballbody, ballform)
-	global ballbody
-	global ballform
+	global ballbody,ballform
 	return ballform
 
 def newgate():
@@ -94,6 +93,8 @@ def printletters():
 	lettera_L = fontsmallest.render(("L"),True,THECOLORS["white"])
 	lettera_Y = fontsmall.render(("Y"),True,THECOLORS["white"])
 
+	starimg = pygame.image.load("star.png")
+
 	if letters["n"] == True:
 		window.blit(lettera_N,(620,140))
 	if letters["i"] == True:
@@ -133,6 +134,8 @@ def printletters():
 	if letters["y"] == True:
 		window.blit(lettera_Y,(524,301))
 		pygame.draw.line(window, pygame.color.THECOLORS["white"], (515,305), (541,295), 3)
+	if star == True:
+		window.blit(star,(31,28))
 
 def speed(springs):
 	if springs == 584:
@@ -203,7 +206,7 @@ def multiball():
 	ballform.elasticity = 0.7
 	ballform.group = 1
 	ballform.color = pygame.color.THECOLORS["white"]
-	ballform.collision_type = collisions["ball"]
+	ballform.collision_type = 1
 	ballbody.position = 852, 154
 	space.add(ballbody, ballform)
 	balls.append(ballform)
@@ -225,12 +228,6 @@ time = pygame.time.Clock()
 space = pm.Space()
 space.gravity = (0.0, -180.0)
 OptionsDraw = pymunk.pygame_util.DrawOptions(window)
-
-collisions = {
-	"ball": 1,
-	"bumpers": 2,
-	"bumperb": 3
-}
 
 staticwalls = [pymunk.Segment(space.static_body, (875, 136), (905, 136), 1.0)
 				,pymunk.Segment(space.static_body, (873, 136), (873, 560), 1.0)
@@ -338,7 +335,7 @@ for b in [(790,500), (650,320),(700,450)]:
 	body.position = b
 	shape = pymunk.Circle(body, 14)
 	shape.elasticity = 3
-	shape.collision_type = collisions["bumperb"]
+	shape.collision_type = 3
 	shape.friction = 1
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
@@ -348,7 +345,7 @@ for s in [(630,500),(550,350)]:
 	body.position = s
 	shape = pymunk.Circle(body, 9)
 	shape.elasticity = 2
-	shape.collision_type = collisions["bumpers"]
+	shape.collision_type = 2
 	shape.color = pygame.color.THECOLORS["white"]
 	space.add(shape)
 	bumpers.append(shape)
@@ -417,16 +414,20 @@ letters = setletters()
 scores = 0
 scorebonus = 0
 bumperbonus = 0
-credit = 0
+credit = 1
 nball = 0
 tilt = 0
+#~ record = 0
+star = False
 animazione = 1
 animazionep = 1
 special = True
 suca = True
 start = True
 tilted = False
-global scores
+hard = False
+startcredit = False
+select = True
 while 1:
 	while start:
 		#Menu Start
@@ -451,12 +452,45 @@ while 1:
 				springs = 584
 
 				running = True
-				pause = True
+				pause = False
 				start = False
 		window.blit(namegame,(473,70))
 		window.blit(quitgame,(490,230))
 		window.blit(startgame,(485,280))
 		pygame.display.update()
+	while select:
+			window.fill(THECOLORS["black"])
+			selectd = font.render(("Select difficulty"),True,THECOLORS["white"])
+			ez = fontsmall.render(("E               Easy level"),True,THECOLORS["white"])
+			md = fontsmall.render(("M               Medium level"),True,THECOLORS["white"])
+			hd = fontsmall.render(("H               Hard level"),True,THECOLORS["white"])
+			for event in pygame.event.get():
+				if event.type == QUIT:
+					pygame.quit()
+					sys.exit()
+				if event.type == KEYDOWN and event.key == K_e:
+					running = True
+					select = False
+					body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+					body.position = (605,20)
+					shape = pymunk.Circle(body, 5)
+					shape.friction = 1
+					shape.color = pygame.color.THECOLORS["white"]
+					space.add(shape)
+					bumpers.append(shape)
+					shape.elasticity = 0.8
+				elif event.type == KEYDOWN and event.key == K_m:
+					running = True
+					select = False
+				elif event.type == KEYDOWN and event.key == K_h:
+					hard = True
+					running = True
+					select = False
+			window.blit(selectd,(400,70))
+			window.blit(ez,(470,300))
+			window.blit(md,(470,350))
+			window.blit(hd,(470,400))
+			pygame.display.update()
 	while running:
 		sfondo = pygame.image.load("prova1.jpg")
 		window.blit(sfondo,(0,0))
@@ -470,17 +504,27 @@ while 1:
 			elif event.type == KEYDOWN and event.key == K_ESCAPE:
 				pause = True
 				running = False
-			elif event.type == KEYDOWN and event.key == K_c:
-				if credit != 25:
-					credit+=1
-					sound = pygame.mixer.Sound("credit.ogg")
-					sound.play()
+			elif event.type == KEYDOWN and event.key == K_c and startcredit == False:
+				if hard == True:
+					if credit != 5:
+						credit+=1
+						sound = pygame.mixer.Sound("credit.ogg")
+						sound.play()
+				else:
+					if credit != 25:
+						credit+=1
+						sound = pygame.mixer.Sound("credit.ogg")
+						sound.play()
 			elif event.type == KEYDOWN and event.key == K_LSHIFT:
+				startcredit = True
 				if credit != 0:
 					if balls == []:
 						balls.append(newball())
 						credit -= 1
-						nball += 3
+						if hard == True:
+							nball += 2
+						else:
+							nball += 5
 			elif event.type == KEYDOWN and event.key == K_RIGHT and tilted == False:
 				r_bar_body.apply_impulse_at_local_point(Vec2d.unit() * 15000, (-100, 0))
 			elif event.type == KEYDOWN and event.key == K_LEFT and tilted == False:
@@ -499,7 +543,7 @@ while 1:
 				if balls != []:
 					tilt += 1
 					ballbody.apply_impulse_at_local_point((Vec2d((-100,0))))
-			elif event.type == KEYDOWN and event.key == K_SPACE: #and 146 <= ballbody.position[1] <= 147 and ballbody.position[0] == 890.0:
+			elif event.type == KEYDOWN and event.key == K_SPACE and 147 <= ballbody.position.y <= 148 and ballbody.position.x == 890.0:
 				power = speed(springs)
 				ballbody.apply_impulse_at_local_point((Vec2d((0,power))))
 				drawsprings()
@@ -515,7 +559,7 @@ while 1:
 				ballform = pm.Circle(ballbody, radius, (0,0))
 				ballform.elasticity = 0.7
 				ballform.group = 1
-				ballform.collision_type = collisions["ball"]
+				ballform.collision_type = 1
 				ballbody.position = puntisuca
 				ballform.color = THECOLORS["white"]
 				global ballform,ballbody
@@ -569,7 +613,7 @@ while 1:
 			ballform.elasticity = 0.7
 			ballform.group = 1
 			ballform.color = pygame.color.THECOLORS["white"]
-			ballform.collision_type = collisions["ball"]
+			ballform.collision_type = 1
 			ballbody.position = 510, 480
 			space.add(ballbody, ballform)
 			balls.append(ballform)
@@ -593,9 +637,11 @@ while 1:
 				gates = deletegate(gates)
 			letters = setletters()
 			if balls == []:
-				if nball != 0:
+				if nball > 1:
 					#Create new ball
 					balls.append(newball())
+					nball -= 1
+				elif nball == 1:
 					nball -= 1
 
 		space.debug_draw(OptionsDraw)
@@ -657,16 +703,11 @@ while 1:
 				animazionep = 1
 			else:
 				animazionep += 1
-		printcredit(credit)
 
-		##Punteggio for bumper
-		h = space.add_collision_handler(
-			collisions["ball"], 
-			collisions["bumpers"])
+		#Punteggio for bumper
+		h = space.add_collision_handler(1,2)
 		h.post_solve = bumpersmall
-		p = space.add_collision_handler(
-			collisions["ball"], 
-			collisions["bumperb"])
+		p = space.add_collision_handler(1,3)
 		p.post_solve = bumperbig
 		if ballform.group == 2:
 			scores += 50 + bumperbonus
@@ -677,7 +718,6 @@ while 1:
 		if letters["bonusbumper"] == False:
 			bumperbonus = 150
 
-
 		#Multiball
 		if letters["multiball"] == False:
 			multiball()
@@ -687,8 +727,44 @@ while 1:
 				multiball()
 				suca = False
 
+		#To start a game
+		if nball == 0:
+			startgame = fontsmall.render(("Press LEFT SHIFT"),True,THECOLORS["white"])
+			respawnball = fontsmall.render(("To start a game"),True,THECOLORS["white"])
+			window.blit(startgame,(995,90))
+			window.blit(respawnball,(999,123))
+			scores = 0
+			setletters()
+
+		#Loser
+		loser = False
+		if nball == 0 and credit == 0:
+			loser = True
+			while loser:
+				#~ space.remove(ballbody, ballform)
+				#~ balls.remove(ballform)
+				sfondo = pygame.image.load("prova1.jpg")
+				window.blit(sfondo,(0,0))
+				for event in pygame.event.get():
+					if event.type == QUIT:
+						pygame.quit()
+						sys.exit()
+					elif event.type == KEYDOWN and event.key == K_ESCAPE:
+						pause = True
+						running = False
+						loser = False
+
+		printcredit(credit)
 		scores,scorebonus = score.countscore(ballbody.position.x,ballbody.position.y,letters,scores,scorebonus,special)
 		drawall()
+
+		if scores >= 10000000:
+			star = True
+			credit += 1
+
+		#~ if scores > record:
+			#~ record = scores
+			#~ credit += 3
 
 		#Update Physics
 		dt = 1/60.0/6
